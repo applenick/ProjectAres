@@ -148,7 +148,7 @@ public class SparklingUtil {
         NMSHacks.showFakeItems(plugin,
                                player,
                                player.getLocation().add(0, 2, 0),
-                               new ItemStack(Material.GHAST_TEAR),
+                               new ItemStack(Material.GOLD_NUGGET),
                                count,
                                Duration.ofSeconds(3));
     }
@@ -156,7 +156,7 @@ public class SparklingUtil {
     private static BaseComponent raindropsMessage(int count, int multiplier, @Nullable BaseComponent reason) {
         Component message = new Component(ChatColor.GRAY);
         message.extra(new Component((count > 0 ? "+" : "") + count, ChatColor.GREEN, ChatColor.BOLD),
-                      new Component(" Raindrop" + (count == 1 || count == -1 ? "" : "s"), ChatColor.AQUA));
+                      new Component(" Sparkling" + (count == 1 || count == -1 ? "" : "s"), ChatColor.YELLOW));
         if(multiplier != 100) {
             message.extra(new Component(" | ", ChatColor.DARK_PURPLE),
                           new Component((multiplier / 100f) + "x", ChatColor.GOLD, ChatColor.ITALIC));
