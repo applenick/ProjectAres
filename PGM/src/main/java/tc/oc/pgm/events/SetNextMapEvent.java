@@ -15,6 +15,10 @@ public class SetNextMapEvent extends Event {
     public PGMMap getMap() {
         return map;
     }
+    
+    public int getMaxPlayers(){
+    	return map.getDocument().max_players();
+    }
 
     private static final HandlerList handlers = new HandlerList();
 
