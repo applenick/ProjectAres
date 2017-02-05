@@ -1,4 +1,4 @@
-package tc.oc.commons.bukkit.raindrops;
+package tc.oc.commons.bukkit.sparklings;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -21,7 +21,7 @@ import tc.oc.commons.bukkit.util.SyncPlayerExecutorFactory;
 import tc.oc.commons.core.chat.Audience;
 import tc.oc.commons.core.chat.Component;
 
-public class RaindropUtil {
+public class SparklingUtil {
 
     @Inject private static Plugin plugin;
     @Inject private static BukkitUserStore userStore;
@@ -36,9 +36,9 @@ public class RaindropUtil {
 
     public static int calculateMultiplier(PlayerId playerId) {
         final Player player = userStore.find(playerId);
-        int multiplier = RaindropConstants.MULTIPLIER_BASE;
+        int multiplier = SparklingConstants.MULTIPLIER_BASE;
         if(player != null) {
-            for(int i = RaindropConstants.MULTIPLIER_MAX; i > 0; i = i - RaindropConstants.MULTIPLIER_INCREMENT) {
+            for(int i = SparklingConstants.MULTIPLIER_MAX; i > 0; i = i - SparklingConstants.MULTIPLIER_INCREMENT) {
                 if(player.hasPermission("raindrops.multiplier." + i)) {
                     multiplier = i;
                     break;
@@ -56,23 +56,23 @@ public class RaindropUtil {
         return delta;
     }
 
-    public static void giveRaindrops(PlayerId playerId, int count, @Nullable RaindropResult result) {
+    public static void giveRaindrops(PlayerId playerId, int count, @Nullable SparklingResult result) {
         giveRaindrops(playerId, count, result, null);
     }
 
-    public static void giveRaindrops(PlayerId playerId, int count, @Nullable RaindropResult result, @Nullable BaseComponent reason) {
+    public static void giveRaindrops(PlayerId playerId, int count, @Nullable SparklingResult result, @Nullable BaseComponent reason) {
         giveRaindrops(playerId, count, result, reason, true);
     }
 
-    public static void giveRaindrops(PlayerId playerId, int delta, @Nullable RaindropResult result, @Nullable BaseComponent reason, boolean useMultiplier) {
+    public static void giveRaindrops(PlayerId playerId, int delta, @Nullable SparklingResult result, @Nullable BaseComponent reason, boolean useMultiplier) {
         giveRaindrops(playerId, delta, result, reason, useMultiplier, true);
     }
 
-    public static void giveRaindrops(PlayerId playerId, int delta, @Nullable RaindropResult result, @Nullable BaseComponent reason, boolean useMultiplier, boolean save) {
+    public static void giveRaindrops(PlayerId playerId, int delta, @Nullable SparklingResult result, @Nullable BaseComponent reason, boolean useMultiplier, boolean save) {
         giveRaindrops(playerId, delta, result, reason, useMultiplier, save, true);
     }
 
-    public static void giveRaindrops(PlayerId playerId, int delta, @Nullable RaindropResult result, @Nullable BaseComponent reason, boolean useMultiplier, boolean save, boolean show) {
+    public static void giveRaindrops(PlayerId playerId, int delta, @Nullable SparklingResult result, @Nullable BaseComponent reason, boolean useMultiplier, boolean save, boolean show) {
         if(delta == 0) return;
 
         final int multiplier;
@@ -80,17 +80,17 @@ public class RaindropUtil {
             multiplier = calculateMultiplier(playerId);
             delta = useMultiplier(delta, multiplier);
         } else {
-            multiplier = RaindropConstants.MULTIPLIER_BASE;
+            multiplier = SparklingConstants.MULTIPLIER_BASE;
         }
 
         giveRaindrops(playerId, delta, multiplier, result, reason, save, show);
     }
 
-    public static void giveRaindrops(PlayerId playerId, int delta, int multiplier, @Nullable RaindropResult result, @Nullable BaseComponent reason, boolean save) {
+    public static void giveRaindrops(PlayerId playerId, int delta, int multiplier, @Nullable SparklingResult result, @Nullable BaseComponent reason, boolean save) {
         giveRaindrops(playerId, delta, multiplier, result, reason, save, true);
     }
 
-    public static void giveRaindrops(PlayerId playerId, int delta, int multiplier, @Nullable RaindropResult result, @Nullable BaseComponent reason, boolean save, boolean show) {
+    public static void giveRaindrops(PlayerId playerId, int delta, int multiplier, @Nullable SparklingResult result, @Nullable BaseComponent reason, boolean save, boolean show) {
         final int countBefore = userStore.getUser(playerId).raindrops();
 
         if(countBefore + delta < 0) {
@@ -129,7 +129,7 @@ public class RaindropUtil {
     }
 
     public static void showRaindrops(Player player, int delta, int multiplier, @Nullable BaseComponent reason, boolean show) {
-        eventBus.callEvent(new PlayerRecieveRaindropsEvent(player, delta, multiplier, reason));
+        eventBus.callEvent(new PlayerRecieveSparklingsEvent(player, delta, multiplier, reason));
         if (show) {
             final Audience audience = audiences.get(player);
             audience.sendMessage(raindropsMessage(delta, multiplier, reason));

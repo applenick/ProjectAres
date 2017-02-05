@@ -20,7 +20,7 @@ public class TicketCommands implements Commands {
         this.ticketBooth = ticketBooth;
     }
 
-    @Command(
+   /* @Command(
         aliases = { "games" },
         desc = "List all the games you can play",
         min = 0,
@@ -72,5 +72,5 @@ public class TicketCommands implements Commands {
 
         ticketBooth.watchGame(CommandUtils.senderToPlayer(sender), name);
         return null;
-    }
+    }*/
 }

@@ -67,7 +67,7 @@ public class ServerVisibilityCommands implements Listener, Commands {
         return minecraftService.updateLocalServer(new Info(visibility));
     }
 
-    @Command(
+    /*@Command(
         aliases = { "visibility" },
         desc = "Show or change the visibility type of this server",
         usage = "[public|unlisted]",
@@ -100,7 +100,7 @@ public class ServerVisibilityCommands implements Listener, Commands {
                 })
             );
         }
-    }
+    }*/
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void hideAbandonedServer(PlayerQuitEvent event) {

@@ -109,7 +109,7 @@ public class PunishmentCommands implements Commands {
         }
     }
 
-    @Command(
+    /*@Command(
         aliases = { "w", "warn" },
         flags = "aso",
         usage = "<player> <reason>",
@@ -226,6 +226,6 @@ public class PunishmentCommands implements Commands {
                 );
             }
         );
-    }
+    }*/
 
 }

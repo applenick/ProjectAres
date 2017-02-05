@@ -26,8 +26,8 @@ import org.bukkit.util.Vector;
 import tc.oc.api.bukkit.users.BukkitUserStore;
 import tc.oc.api.bukkit.users.OnlinePlayers;
 import tc.oc.api.bukkit.users.Users;
-import tc.oc.commons.bukkit.raindrops.RaindropResult;
-import tc.oc.commons.bukkit.raindrops.RaindropUtil;
+import tc.oc.commons.bukkit.sparklings.SparklingResult;
+import tc.oc.commons.bukkit.sparklings.SparklingUtil;
 import tc.oc.lobby.bukkit.Lobby;
 import tc.oc.lobby.bukkit.LobbyTranslations;
 import tc.oc.lobby.bukkit.gizmos.Gizmo;
@@ -76,7 +76,7 @@ public class GunGizmo extends Gizmo implements Listener {
                 || event.getItem() == null || event.getItem().getType() != this.getIcon()) return;
 
         final Player player = event.getPlayer();
-        RaindropUtil.giveRaindrops(Users.playerId(player), -1, new RaindropResult() {
+        SparklingUtil.giveRaindrops(Users.playerId(player), -1, new SparklingResult() {
             @Override
             public void run() {
                 if(success) {
@@ -102,7 +102,7 @@ public class GunGizmo extends Gizmo implements Listener {
                 gifts.forEach(playerId -> counts.merge(playerId, 1, Integer::sum));
 
                 counts.forEach((playerId, count) -> onlinePlayers.byUuid(playerId).ifPresent(player -> {
-                    RaindropUtil.giveRaindrops(
+                    SparklingUtil.giveRaindrops(
                         userStore.playerId(player),
                         count,
                         null,

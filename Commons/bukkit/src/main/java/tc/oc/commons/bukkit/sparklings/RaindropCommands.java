@@ -1,4 +1,4 @@
-package tc.oc.commons.bukkit.raindrops;
+package tc.oc.commons.bukkit.sparklings;
 
 import javax.inject.Inject;
 
@@ -35,7 +35,7 @@ public class RaindropCommands implements Commands {
         this.identityProvider = identityProvider;
     }
 
-    @Command(
+    /*@Command(
         aliases = {"raindrops", "rds"},
         usage = "[player]",
         desc = "Shows the amount of raindrops that you have",
@@ -63,5 +63,5 @@ public class RaindropCommands implements Commands {
                 );
             })
         );
-    }
+    }*/
 }

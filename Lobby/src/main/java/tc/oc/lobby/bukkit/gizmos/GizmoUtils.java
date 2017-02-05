@@ -16,13 +16,13 @@ import tc.oc.lobby.bukkit.Lobby;
 import tc.oc.minecraft.scheduler.SyncExecutor;
 import tc.oc.api.users.PurchaseGizmoRequest;
 import tc.oc.api.users.UserService;
+import tc.oc.commons.bukkit.sparklings.PlayerRecieveSparklingsEvent;
 import tc.oc.commons.core.chat.Component;
 import tc.oc.commons.core.commands.CommandFutureCallback;
 import tc.oc.commons.core.formatting.StringUtils;
 import tc.oc.lobby.bukkit.LobbyTranslations;
 import tc.oc.lobby.bukkit.Utils;
 import tc.oc.lobby.bukkit.listeners.RaindropsListener;
-import tc.oc.commons.bukkit.raindrops.PlayerRecieveRaindropsEvent;
 
 public class GizmoUtils {
 
@@ -93,7 +93,7 @@ public class GizmoUtils {
             CommandFutureCallback.onSuccess(player, obj -> {
                 if(!player.isOnline()) return;
 
-                Bukkit.getPluginManager().callEvent(new PlayerRecieveRaindropsEvent(player, -gizmo.getCost(), 100, new Component("Purchased gizmo")));
+                Bukkit.getPluginManager().callEvent(new PlayerRecieveSparklingsEvent(player, -gizmo.getCost(), 100, new Component("Purchased gizmo")));
                 player.addAttachment(Lobby.get(), gizmo.getPermissionNode(), true);
                 Gizmos.purchasingMap.remove(player);
                 setGizmo(player, gizmo, false);

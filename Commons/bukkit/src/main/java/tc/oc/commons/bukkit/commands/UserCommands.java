@@ -48,7 +48,7 @@ public class UserCommands implements Commands {
         this.userFormatter = userFormatter;
     }
 
-    @Command(
+    /*@Command(
         aliases = { "seen", "find" },
         usage = "<player>",
         desc = "Shows when a player was last seen",
@@ -121,5 +121,5 @@ public class UserCommands implements Commands {
                 userFormatter.formatSessions(result.documents()).forEach(audience::sendMessage);
             })
         );
-    }
+    }*/
 }

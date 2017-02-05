@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class PermissionCommands implements NestedCommands {
     public static class Parent implements Commands {
-        @Command(
+       /* @Command(
             aliases = {"permission", "perm"},
             desc = "Commands to query permissions",
             min = 1,
@@ -31,7 +31,7 @@ public class PermissionCommands implements NestedCommands {
         @NestedCommand({PermissionCommands.class})
         @CommandPermissions(Permissions.DEVELOPER)
         public void perm() {
-        }
+        }*/
     }
 
     void sendPermissionInfo(String name, CommandSender sender) {
@@ -78,7 +78,7 @@ public class PermissionCommands implements NestedCommands {
         }
     }
 
-    @Command(
+    /*@Command(
         aliases = {"info"},
         desc = "Get detailed info about a permission",
         usage = "<permission>",
@@ -134,5 +134,5 @@ public class PermissionCommands implements NestedCommands {
                                    (perm.getAttachment() == null ? "" : " (" + perm.getAttachment().getPlugin().getName() + ")"));
             }
         }
-    }
+    }*/
 }

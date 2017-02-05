@@ -59,7 +59,7 @@ public class ServerCommands implements Commands {
         return c;
     }
 
-    @Command(
+    /*@Command(
         aliases = { "servers", "srvs" },
         desc = "Show a listing of all servers on the network",
         usage = "[page]",
@@ -166,5 +166,5 @@ public class ServerCommands implements Commands {
     )
     public void hub(final CommandContext args, CommandSender sender) throws CommandException {
         teleporter.sendToLobby(CommandUtils.senderToPlayer(sender), args.getString(0, null));
-    }
+    }*/
 }

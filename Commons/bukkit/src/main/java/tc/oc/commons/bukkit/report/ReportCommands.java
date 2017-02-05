@@ -91,7 +91,7 @@ public class ReportCommands implements Commands, Listener {
         }
     }
 
-    @Command(
+   /* @Command(
         aliases = { "report" },
         usage = "<player> <reason>",
         desc = "Report a player who is breaking the rules",
@@ -191,5 +191,5 @@ public class ReportCommands implements Commands, Listener {
                 );
             })
         );
-    }
+    }*/
 }

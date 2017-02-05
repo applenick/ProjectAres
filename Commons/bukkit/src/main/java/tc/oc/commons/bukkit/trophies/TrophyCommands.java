@@ -50,16 +50,16 @@ public class TrophyCommands implements NestedCommands {
     }
 
     public static class Parent implements Commands {
-        @Command(
+        /*@Command(
                 aliases = {"trophies", "trophy"},
                 desc = "Commands relating to trophies."
         )
         @CommandPermissions(TrophyPermissions.BASE)
         @NestedCommand(value = TrophyCommands.class, executeBody = true)
-        public void trophies(CommandContext args, CommandSender sender) throws CommandException {}
+        public void trophies(CommandContext args, CommandSender sender) throws CommandException {}*/
     }
 
-    @Command(
+    /*@Command(
             aliases = {"list"},
             desc = "List the trophies of a player",
             usage = "<player> <page>",
@@ -148,5 +148,5 @@ public class TrophyCommands implements NestedCommands {
                 );
             })
         );
-    }
+    }*/
 }

@@ -147,7 +147,7 @@ public class NicknameCommands implements Listener, Commands {
         }
     }
 
-    @Command(aliases = {"nick" },
+    /*@Command(aliases = {"nick" },
              usage = "list | show [player] | set <nickname> [player] | clear [player] | <nickname> [player]",
              desc = "Show, set, or clear a nickname for yourself or another player. " +
                     "Changes will take effect the next time the player " +
@@ -191,7 +191,7 @@ public class NicknameCommands implements Listener, Commands {
                     break;
             }
         }
-    }
+    }*/
 
     public void list(final CommandSender sender) throws CommandException {
         CommandUtils.assertPermission(sender, PERMISSION_ANY_GET);

@@ -1,18 +1,18 @@
-package tc.oc.commons.bukkit.raindrops;
+package tc.oc.commons.bukkit.sparklings;
 
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
 
-public class PlayerRecieveRaindropsEvent extends PlayerEvent {
+public class PlayerRecieveSparklingsEvent extends PlayerEvent {
     private static final HandlerList handlers = new HandlerList();
 
     protected final int raindrops;
     protected final int multiplier;
     protected final BaseComponent reason;
 
-    public PlayerRecieveRaindropsEvent(Player who, int raindrops, int multiplier, BaseComponent reason) {
+    public PlayerRecieveSparklingsEvent(Player who, int raindrops, int multiplier, BaseComponent reason) {
         super(who);
         this.raindrops = raindrops;
         this.multiplier = multiplier;

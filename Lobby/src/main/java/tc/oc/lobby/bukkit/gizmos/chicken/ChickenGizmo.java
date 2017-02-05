@@ -22,6 +22,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import tc.oc.api.bukkit.users.Users;
 import tc.oc.commons.bukkit.nick.IdentityProvider;
+import tc.oc.commons.bukkit.sparklings.SparklingUtil;
 import tc.oc.commons.bukkit.util.NMSHacks;
 import tc.oc.commons.core.chat.Component;
 import tc.oc.lobby.bukkit.Lobby;
@@ -29,7 +30,6 @@ import tc.oc.lobby.bukkit.LobbyTranslations;
 import tc.oc.lobby.bukkit.gizmos.Gizmo;
 import tc.oc.lobby.bukkit.gizmos.GizmoConfig;
 import tc.oc.lobby.bukkit.gizmos.Gizmos;
-import tc.oc.commons.bukkit.raindrops.RaindropUtil;
 
 public class ChickenGizmo extends Gizmo implements Listener {
 
@@ -141,7 +141,7 @@ public class ChickenGizmo extends Gizmo implements Listener {
         chickendCount.compute(victim, (player, count) -> {
             count = count == null ? 0 : count + 1;
             if(count > 0 && count % 10 == 0) {
-                RaindropUtil.giveRaindrops(
+                SparklingUtil.giveRaindrops(
                     Users.playerId(damager), 1, null,
                     new TranslatableComponent("gizmo.chicken.raindropsResult", new Component(String.valueOf(count), net.md_5.bungee.api.ChatColor.GOLD))
                 );

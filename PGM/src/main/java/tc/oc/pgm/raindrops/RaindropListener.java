@@ -23,8 +23,8 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Wool;
 import tc.oc.api.docs.PlayerId;
-import tc.oc.commons.bukkit.raindrops.RaindropConstants;
-import tc.oc.commons.bukkit.raindrops.RaindropUtil;
+import tc.oc.commons.bukkit.sparklings.SparklingConstants;
+import tc.oc.commons.bukkit.sparklings.SparklingUtil;
 import tc.oc.commons.core.chat.Component;
 import tc.oc.commons.core.util.Comparables;
 import tc.oc.pgm.PGM;
@@ -111,12 +111,12 @@ public class RaindropListener implements Listener {
         final Set<Competitor> winners = event.getMatch().needMatchModule(VictoryMatchModule.class).winners();
         Match match = event.getMatch();
 
-        boolean applyCutoff = Comparables.greaterThan(match.getLength(), RaindropConstants.TEAM_REWARD_CUTOFF);
+        boolean applyCutoff = Comparables.greaterThan(match.getLength(), SparklingConstants.TEAM_REWARD_CUTOFF);
         for(MatchPlayer player : match.getParticipatingPlayers()) {
             if(player.getParty() instanceof Team) {
                 Team team = (Team) player.getParty();
                 Duration teamTime = team.getCumulativeParticipation(player.getPlayerId());
-                if(!(applyCutoff && Comparables.lessThan(teamTime, RaindropConstants.TEAM_REWARD_CUTOFF))) {
+                if(!(applyCutoff && Comparables.lessThan(teamTime, SparklingConstants.TEAM_REWARD_CUTOFF))) {
                     Component message = new Component(net.md_5.bungee.api.ChatColor.GRAY);
                     double percent = 1.0;
                     Competitor playerTeam = player.getCompetitor();
@@ -133,10 +133,10 @@ public class RaindropListener implements Listener {
                         message.extra(new TranslatableComponent("matchend.team.loyalty",
                                                                 playerTeam.getComponentName(),
                                                                 new Component(String.valueOf(teamTime.toMinutes()))));
-                        percent = RaindropConstants.LOSING_TEAM_REWARD_PERCENT;
+                        percent = SparklingConstants.LOSING_TEAM_REWARD_PERCENT;
                     }
 
-                    givePercentageRaindrops(player.getParticipantState(), RaindropConstants.TEAM_REWARD, message, true, percent);
+                    givePercentageRaindrops(player.getParticipantState(), SparklingConstants.TEAM_REWARD, message, true, percent);
                 }
             }
         }
@@ -149,7 +149,7 @@ public class RaindropListener implements Listener {
 
     private void giveGoalTouchRaindrops(ParticipantState player, TouchableGoal goal) {
         this.giveRaindrops(player,
-                           RaindropConstants.TOUCH_GOAL_REWARD,
+                           SparklingConstants.TOUCH_GOAL_REWARD,
                            goal.getTouchMessage(player, true));
     }
 
@@ -192,7 +192,7 @@ public class RaindropListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void woolPlace(final PlayerWoolPlaceEvent event) {
         if (event.getWool().isVisible()) {
-            giveRaindrops(event.getPlayer().getPlayerId(), RaindropConstants.WOOL_PLACE_REWARD, new TranslatableComponent("match.wool.place", event.getWool().getComponentName()));
+            giveRaindrops(event.getPlayer().getPlayerId(), SparklingConstants.WOOL_PLACE_REWARD, new TranslatableComponent("match.wool.place", event.getWool().getComponentName()));
         }
     }
 
@@ -203,7 +203,7 @@ public class RaindropListener implements Listener {
                 String percentage = ChatColor.GREEN.toString() + ((int) (info.getPercentage() * 100)) + ChatColor.GRAY;
                 BaseComponent reason = new TranslatableComponent("match.destroyable.destroy", percentage, new Component(event.getDestroyable().getName(), net.md_5.bungee.api.ChatColor.GREEN));
 
-                giveRaindrops(info.getPlayerState().getPlayerId(), (int) (RaindropConstants.DESTROYABLE_DESTROY_PERCENT_REWARD * info.getPercentage()), reason);
+                giveRaindrops(info.getPlayerState().getPlayerId(), (int) (SparklingConstants.DESTROYABLE_DESTROY_PERCENT_REWARD * info.getPercentage()), reason);
             }
         }
     }
@@ -216,7 +216,7 @@ public class RaindropListener implements Listener {
 
         final int raindrops = calculateRaindrops(
             event.getKiller(),
-            RaindropConstants.KILL_REWARD,
+            SparklingConstants.KILL_REWARD,
             false,
             1
         );
@@ -225,10 +225,10 @@ public class RaindropListener implements Listener {
 
         final MatchPlayer killer = event.getOnlineKiller();
         if(killer != null) {
-            RaindropUtil.showRaindrops(
+            SparklingUtil.showRaindrops(
                 killer.getBukkit(),
                 raindrops,
-                RaindropUtil.calculateMultiplier(event.getKiller().getPlayerId()),
+                SparklingUtil.calculateMultiplier(event.getKiller().getPlayerId()),
                 new TranslatableComponent("match.kill.killed", event.getVictim().getComponentName())
             );
         }
@@ -242,21 +242,21 @@ public class RaindropListener implements Listener {
     private void giveWoolDestroyRaindrops(final MatchPlayer player, final DyeColor wool) {
         if(!this.destroyedWools.containsEntry(wool, player.getPlayerId())) {
             this.destroyedWools.put(wool, player.getPlayerId());
-            giveRaindrops(player.getPlayerId(), RaindropConstants.WOOL_DESTROY_REWARD, new TranslatableComponent("match.wool.destroy", MonumentWoolFactory.makeComponentName(wool)));
+            giveRaindrops(player.getPlayerId(), SparklingConstants.WOOL_DESTROY_REWARD, new TranslatableComponent("match.wool.destroy", MonumentWoolFactory.makeComponentName(wool)));
         }
     }
 
     private int calculateRaindrops(MatchPlayerState player, int count, boolean scaled, double percent) {
         if(scaled) {
             final Match match = player.getMatch();
-            count += (int) ((double) match.getParticipatingPlayers().size() / match.getMaxPlayers() * RaindropConstants.MATCH_FULLNESS_BONUS);
+            count += (int) ((double) match.getParticipatingPlayers().size() / match.getMaxPlayers() * SparklingConstants.MATCH_FULLNESS_BONUS);
 
             if(player.getParty() instanceof Team) {
-                count += Ints.min((int) (Math.sqrt(((Team) player.getParty()).getCumulativeParticipation(player.getPlayerId()).getSeconds()) / RaindropConstants.PLAY_TIME_BONUS), RaindropConstants.PLAY_TIME_BONUS_CUTOFF);
+                count += Ints.min((int) (Math.sqrt(((Team) player.getParty()).getCumulativeParticipation(player.getPlayerId()).getSeconds()) / SparklingConstants.PLAY_TIME_BONUS), SparklingConstants.PLAY_TIME_BONUS_CUTOFF);
             }
         }
 
-        return RaindropUtil.calculateRaindrops(player.getPlayerId(), (int) (count * percent), true);
+        return SparklingUtil.calculateRaindrops(player.getPlayerId(), (int) (count * percent), true);
     }
 
     private void giveRaindrops(final MatchPlayerState player, int count, BaseComponent reason) {
@@ -268,14 +268,14 @@ public class RaindropListener implements Listener {
     }
 
     private void giveRaindrops(final PlayerId playerId, int count, BaseComponent reason) {
-        RaindropUtil.giveRaindrops(playerId, count, null, reason);
+        SparklingUtil.giveRaindrops(playerId, count, null, reason);
     }
 
     private void givePercentageRaindrops(final MatchPlayerState player, int count, final BaseComponent reason, boolean scaled, double percent) {
-        RaindropUtil.giveRaindrops(
+        SparklingUtil.giveRaindrops(
             player.getPlayerId(),
             calculateRaindrops(player, count, scaled, percent),
-            RaindropUtil.calculateMultiplier(player.getPlayerId()),
+            SparklingUtil.calculateMultiplier(player.getPlayerId()),
             null,
             reason,
             true

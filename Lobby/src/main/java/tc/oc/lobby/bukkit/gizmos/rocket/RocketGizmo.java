@@ -14,13 +14,13 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.util.Vector;
 import tc.oc.api.bukkit.users.Users;
+import tc.oc.commons.bukkit.sparklings.SparklingUtil;
 import tc.oc.commons.core.chat.Component;
 import tc.oc.lobby.bukkit.Lobby;
 import tc.oc.lobby.bukkit.LobbyTranslations;
 import tc.oc.lobby.bukkit.gizmos.Gizmo;
 import tc.oc.lobby.bukkit.gizmos.GizmoConfig;
 import tc.oc.lobby.bukkit.gizmos.Gizmos;
-import tc.oc.commons.bukkit.raindrops.RaindropUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -96,7 +96,7 @@ public class RocketGizmo extends Gizmo implements Listener {
         rocketedCount.put(damager, count);
 
         if(count % 10 == 0) {
-            RaindropUtil.giveRaindrops(
+            SparklingUtil.giveRaindrops(
                 Users.playerId(damager), 1, null,
                 new TranslatableComponent("gizmo.rocket.raindropsResult", new Component(String.valueOf(count), net.md_5.bungee.api.ChatColor.GOLD))
             );

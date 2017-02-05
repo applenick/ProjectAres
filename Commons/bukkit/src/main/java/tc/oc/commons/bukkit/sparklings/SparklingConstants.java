@@ -1,8 +1,8 @@
-package tc.oc.commons.bukkit.raindrops;
+package tc.oc.commons.bukkit.sparklings;
 
 import java.time.Duration;
 
-public class RaindropConstants {
+public class SparklingConstants {
     public static final int TEAM_REWARD = 5;
     public static final double LOSING_TEAM_REWARD_PERCENT = 0.3;
     public static final Duration TEAM_REWARD_CUTOFF = Duration.ofMinutes(2);

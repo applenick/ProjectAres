@@ -20,8 +20,8 @@ import tc.oc.api.bukkit.users.BukkitUserStore;
 import tc.oc.api.docs.PlayerId;
 import tc.oc.api.docs.User;
 import tc.oc.commons.bukkit.chat.ComponentRenderContext;
-import tc.oc.commons.bukkit.raindrops.PlayerRecieveRaindropsEvent;
-import tc.oc.commons.bukkit.raindrops.RaindropUtil;
+import tc.oc.commons.bukkit.sparklings.PlayerRecieveSparklingsEvent;
+import tc.oc.commons.bukkit.sparklings.SparklingUtil;
 import tc.oc.commons.core.format.GeneralFormatter;
 import tc.oc.commons.core.plugin.PluginFacet;
 import tc.oc.lobby.bukkit.Utils;
@@ -73,10 +73,10 @@ public class RaindropsListener implements PluginFacet, Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void recieveRaindrops(final PlayerRecieveRaindropsEvent event) {
+    public void recieveRaindrops(final PlayerRecieveSparklingsEvent event) {
         Integer drops = raindrops.get(event.getPlayer());
         if(drops != null) {
-            setRaindropsCount(event.getPlayer(), drops + RaindropUtil.useMultiplier(event.getRaindrops(), event.getMultiplier()));
+            setRaindropsCount(event.getPlayer(), drops + SparklingUtil.useMultiplier(event.getRaindrops(), event.getMultiplier()));
         }
     }
 

@@ -59,7 +59,6 @@ import tc.oc.commons.bukkit.nick.PlayerAppearanceListener;
 import tc.oc.commons.bukkit.nick.PlayerOrder;
 import tc.oc.commons.bukkit.nick.PlayerOrderCache;
 import tc.oc.commons.bukkit.punishment.PunishmentManifest;
-import tc.oc.commons.bukkit.raindrops.RaindropManifest;
 import tc.oc.commons.bukkit.report.ReportAnnouncer;
 import tc.oc.commons.bukkit.report.ReportCommands;
 import tc.oc.commons.bukkit.respack.ResourcePackCommands;
@@ -68,6 +67,7 @@ import tc.oc.commons.bukkit.respack.ResourcePackManager;
 import tc.oc.commons.bukkit.restart.RestartCommands;
 import tc.oc.commons.bukkit.sessions.SessionListener;
 import tc.oc.commons.bukkit.settings.SettingManifest;
+import tc.oc.commons.bukkit.sparklings.SparklingManifest;
 import tc.oc.commons.bukkit.suspend.SuspendListener;
 import tc.oc.commons.bukkit.tablist.PlayerTabEntry;
 import tc.oc.commons.bukkit.tablist.TabRender;
@@ -109,7 +109,7 @@ public final class CommonsBukkitManifest extends HybridManifest {
         install(new BroadcastManifest());
         install(new LocalizationManifest());
         install(new NavigatorManifest());
-        install(new RaindropManifest());
+        install(new SparklingManifest());
         install(new PunishmentManifest());
 
         // These are already bound as facets, so they only need to be exposed

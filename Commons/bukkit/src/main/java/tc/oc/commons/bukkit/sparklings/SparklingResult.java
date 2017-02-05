@@ -1,6 +1,6 @@
-package tc.oc.commons.bukkit.raindrops;
+package tc.oc.commons.bukkit.sparklings;
 
-public abstract class RaindropResult implements Runnable {
+public abstract class SparklingResult implements Runnable {
     protected boolean success = false;
 
     public void setSuccess(boolean newValue) {
