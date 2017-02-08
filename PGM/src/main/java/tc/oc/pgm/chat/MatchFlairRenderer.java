@@ -3,6 +3,8 @@ package tc.oc.pgm.chat;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.bukkit.entity.Player;
+
 import net.md_5.bungee.api.ChatColor;
 import tc.oc.api.bukkit.users.BukkitUserStore;
 import tc.oc.api.minecraft.MinecraftService;
@@ -19,7 +21,8 @@ import tc.oc.pgm.match.MatchManager;
 @Singleton
 public class MatchFlairRenderer extends FlairRenderer {
 
-    private static final String MAPMAKER_FLAIR_LEGACY = ChatColor.BLUE + "*";
+    private static final String MAPMAKER_FLAIR_LEGACY = ChatColor.BLUE + "\u25A0";
+    private static final String STAFF_FLAIR = ChatColor.GOLD + "\u2756";
 
     private final MatchManager matchManager;
 
@@ -37,11 +40,28 @@ public class MatchFlairRenderer extends FlairRenderer {
         // If we ever have multiple simulataneous matches, the mapmaker flair will show
         // in all matches, not just the one for the player's map. We can't avoid this
         // without some way to render names differently in each match (which we could do).
-        for(Match match : matchManager.currentMatches()) {
-            if(!match.isUnloaded() && match.getMap().getInfo().isAuthor(identity.getPlayerId())) {
-                name = MAPMAKER_FLAIR_LEGACY + name;
-                break;
+        for(Match match : matchManager.currentMatches()) {   
+        	        	
+            if(!match.isUnloaded()) {
+            	
+            	if(match.getMap().getInfo().isAuthor(identity.getPlayerId())){
+                    name = MAPMAKER_FLAIR_LEGACY + name;
+                    break;
+            	}
+            	
+            	//TS Start
+            	// Temp Work around until we implement our own Database into Commons
+            	
+            	if(identity.getPlayer() != null){
+            		Player player = identity.getPlayer();
+            		if(player.isOp()){
+            			name = STAFF_FLAIR + name;
+            			break;
+            		}
+            	}
             }
+            
+
         }
 
         return name;

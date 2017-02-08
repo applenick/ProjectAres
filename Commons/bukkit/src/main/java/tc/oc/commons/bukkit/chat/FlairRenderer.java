@@ -6,6 +6,7 @@ import javax.inject.Singleton;
 
 import com.google.common.collect.ImmutableSet;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.minecraft.server.MinecraftServer;
 import tc.oc.api.bukkit.users.BukkitUserStore;
 import tc.oc.api.docs.virtual.UserDoc;
 import tc.oc.api.minecraft.MinecraftService;
@@ -41,6 +42,7 @@ public class FlairRenderer implements PartialNameRenderer {
 
         final Set<String> realms = ImmutableSet.copyOf(minecraftService.getLocalServer().realms());
 
+        
         return user.minecraft_flair()
                    .stream()
                    .filter(flair -> realms.contains(flair.realm))
