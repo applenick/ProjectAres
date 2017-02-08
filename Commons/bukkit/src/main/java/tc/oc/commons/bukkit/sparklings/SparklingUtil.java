@@ -156,7 +156,7 @@ public class SparklingUtil {
     private static BaseComponent raindropsMessage(int count, int multiplier, @Nullable BaseComponent reason) {
         Component message = new Component(ChatColor.GRAY);
         message.extra(new Component((count > 0 ? "+" : "") + count, ChatColor.GREEN, ChatColor.BOLD),
-                      new Component(" Sparkling" + (count == 1 || count == -1 ? "" : "s"), ChatColor.YELLOW));
+                      new Component(" Sparkling" + (count == 1 || count == -1 ? "" : "s"), ChatColor.YELLOW, ChatColor.ITALIC));
         if(multiplier != 100) {
             message.extra(new Component(" | ", ChatColor.DARK_PURPLE),
                           new Component((multiplier / 100f) + "x", ChatColor.GOLD, ChatColor.ITALIC));
