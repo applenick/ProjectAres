@@ -152,7 +152,7 @@ public class MatchLoader implements MatchFinder {
             unloadMatch(oldMatch);
         }
 
-        eventBus.callEvent(new CycleEvent(newMatch, oldMatch));
+        eventBus.callEvent(new CycleEvent(newMatch, oldMatch, newMap));
         log.info("Loaded " + newMap.toString());
         return newMatch;
     }
