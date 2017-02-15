@@ -10,11 +10,17 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+
+import me.anxuiz.settings.SettingManager;
+import me.anxuiz.settings.bukkit.PlayerSettingManager;
+import me.anxuiz.settings.bukkit.PlayerSettings;
+import me.anxuiz.settings.types.BooleanType;
 import tc.oc.pgm.PGM;
 import tc.oc.pgm.events.ListenerScope;
 import tc.oc.pgm.match.MatchModule;
 import tc.oc.pgm.match.MatchScope;
 import tc.oc.pgm.match.Repeatable;
+import tc.oc.pgm.settings.Settings;
 import tc.oc.pgm.utils.EntityUtils;
 
 /**
@@ -26,6 +32,7 @@ public class ProjectileTrailMatchModule extends MatchModule implements Listener 
 
     private static final String TRAIL_META = "projectile_trail_color";
     private static final String CRITICAL_META = "arrow_is_critical";
+        
 
     @Repeatable(scope = MatchScope.RUNNING)
     public void tick() {
@@ -60,14 +67,18 @@ public class ProjectileTrailMatchModule extends MatchModule implements Listener 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onProjectileLaunch(ProjectileLaunchEvent event) {
         match.player(event.getActor()).ifPresent(shooter -> {
-            final Projectile projectile = event.getEntity();
-            projectile.setMetadata(TRAIL_META, new FixedMetadataValue(PGM.get(), shooter.getParty().getFullColor()));
-            // Set critical metadata to false in order to remove default particle trail.
-            // The metadata will be restored just before the arrow hits something.
-            if(projectile instanceof Arrow) {
-                final Arrow arrow = (Arrow) projectile;
-                arrow.setMetadata(CRITICAL_META, new FixedMetadataValue(PGM.get(), arrow.isCritical()));
-                arrow.setCritical(false);
+            final Projectile projectile = event.getEntity();            
+            boolean showTrail = PlayerSettings.getManager(shooter.getBukkit()).getValue(Settings.ARROWS, Boolean.class);
+                        
+            if(showTrail){
+                projectile.setMetadata(TRAIL_META, new FixedMetadataValue(PGM.get(), shooter.getParty().getFullColor()));
+                // Set critical metadata to false in order to remove default particle trail.
+                // The metadata will be restored just before the arrow hits something.
+                if(projectile instanceof Arrow) {
+                    final Arrow arrow = (Arrow) projectile;
+                    arrow.setMetadata(CRITICAL_META, new FixedMetadataValue(PGM.get(), arrow.isCritical()));
+                    arrow.setCritical(false);
+                }
             }
         });
     }

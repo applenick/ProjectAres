@@ -21,12 +21,19 @@ public class Settings extends HybridManifest {
         settings.addBinding().toInstance(BLOOD);
         settings.addBinding().toInstance(RATINGS);
         settings.addBinding().toInstance(SOUNDS);
+        settings.addBinding().toInstance(ARROWS);
 
         bindAndExpose(ObserversCallback.class).in(Singleton.class);
         new SettingCallbackBinder(publicBinder())
             .changesIn(ObserverSetting.get()).to(ObserversCallback.class);
     }
 
+    public static final Setting ARROWS = new SettingBuilder()
+    		.name("ArrowTrails").alias("at")
+    		.summary("Display particle effects for projectiles")
+    		.type(new BooleanType())
+    		.defaultValue(true).get();
+    
     public static final Setting BLOOD = new SettingBuilder()
         .name("Blood")
         .summary("See blood when players get hurt")
