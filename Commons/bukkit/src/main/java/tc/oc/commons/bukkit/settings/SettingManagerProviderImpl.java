@@ -81,14 +81,6 @@ class SettingManagerProviderImpl implements SettingManagerProvider, Listener, Pl
                               : new UserSettingManager(user);
     }
 
-    /**
-     * On login, copy settings from the player's {@link User} document
-     * to their PlayerSettingManager.
-     */
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    public void loadSettings(UserLoginEvent event) {
-        new UserSettingManager(event.getUser()).copyTo(getManager(event.getPlayer()));
-    }
 
     /**
      * Push setting changes to the API
