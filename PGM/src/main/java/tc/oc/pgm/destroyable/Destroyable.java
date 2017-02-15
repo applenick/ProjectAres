@@ -547,7 +547,8 @@ public class Destroyable extends TouchableGoal<DestroyableFactory> implements In
         for(Map.Entry<MatchPlayerState, Integer> entry : playerDamage.entrySet()) {
             builder.add(new DestroyableContribution(
                 entry.getKey(),
-                (double) entry.getValue() / totalDamage, entry.getValue()
+                (double) entry.getValue() / totalDamage, entry.getValue(),
+                getName()
             ));
         }
 
