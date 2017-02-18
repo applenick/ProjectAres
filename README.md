@@ -3,6 +3,12 @@ ProjectAres
 
 Custom Bukkit/Bungee plugins used by the former Overcast Network
 
+# Thunderstorm PvP
+This fork of ProjectAres is used specficly for [Thunderstorm PvP](https://tspvp.com). At the moment many of our commits are rather messy & mainly workarounds in order to get everything working with our own Backend. This branch will __NOT__ be used for pull-requests into the original repo. 
+
+**Note: This branch will not accept public pull-requests or issues. Please direct all Thunderstorm PvP issues [here](https://forums.tspvp.com/category/6/support)
+
+
 # License
 
 ProjectAres is free software: you can redistribute it and/or modify it
