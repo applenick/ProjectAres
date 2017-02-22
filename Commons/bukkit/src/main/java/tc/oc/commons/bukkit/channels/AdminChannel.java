@@ -57,7 +57,7 @@ public class AdminChannel extends SimpleChannel implements Commands {
         this.console = console;
     }
 
-    @Command(aliases = "a",
+    /*@Command(aliases = "a",
              desc = "Sends a message to the staff channel (or sets the staff channel to your default channel).",
              max = -1,
              min = 0,
@@ -96,7 +96,7 @@ public class AdminChannel extends SimpleChannel implements Commands {
         } else {
             throw new CommandPermissionsException();
         }
-    }
+    }*/
 
     @Override
     public void sendMessageToViewer(Player sender, CommandSender viewer, String sanitizedMessage, ChannelMessageEvent event) {

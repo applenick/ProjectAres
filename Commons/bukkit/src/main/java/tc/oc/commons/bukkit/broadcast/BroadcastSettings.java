@@ -13,8 +13,8 @@ import tc.oc.commons.bukkit.settings.SettingManagerProvider;
 public class BroadcastSettings {
 
     public static final Setting TIPS = new SettingBuilder()
-        .name("Tips")
-        .summary("Show tips in chat")
+        .name("Info")
+        .summary("Show info in chat")
         .type(new BooleanType())
         .defaultValue(true)
         .get();
