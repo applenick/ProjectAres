@@ -21,8 +21,8 @@ import tc.oc.pgm.match.MatchManager;
 @Singleton
 public class MatchFlairRenderer extends FlairRenderer {
 
-    private static final String MAPMAKER_FLAIR_LEGACY = ChatColor.BLUE + "\u25A0";
-    private static final String STAFF_FLAIR = ChatColor.GOLD + "\u2756";
+    private static final String MAPMAKER_FLAIR_LEGACY = ChatColor.BLUE + "\u25C8";
+    private static final String STAFF_FLAIR = "\u2756";
 
     private final MatchManager matchManager;
 
@@ -55,6 +55,7 @@ public class MatchFlairRenderer extends FlairRenderer {
             	if(identity.getPlayer() != null){
             		Player player = identity.getPlayer();
             		if(player.isOp()){
+            			
             			name = STAFF_FLAIR + name;
             			break;
             		}
