@@ -11,10 +11,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import me.anxuiz.settings.SettingManager;
-import me.anxuiz.settings.bukkit.PlayerSettingManager;
 import me.anxuiz.settings.bukkit.PlayerSettings;
-import me.anxuiz.settings.types.BooleanType;
 import tc.oc.pgm.PGM;
 import tc.oc.pgm.events.ListenerScope;
 import tc.oc.pgm.match.MatchModule;
@@ -47,7 +44,22 @@ public class ProjectileTrailMatchModule extends MatchModule implements Listener 
                      // - Count is 0
                      // - Speed is 1
                      // - Delta vectors are RGB values from (0,1]
-                     match.getWorld().spawnParticle(
+                     //Check if player has trails active & display if so.
+                     match.participants().filter(player -> PlayerSettings.getManager(player.getBukkit()).getValue(Settings.ARROWS, Boolean.class))
+                     .forEach(player -> {
+                    	 player.getBukkit().spawnParticle(
+                                 Particle.REDSTONE,
+                                 projectile.getLocation(),
+                                 0,
+                                 rgbToParticle(color.getRed()),
+                                 rgbToParticle(color.getGreen()),
+                                 rgbToParticle(color.getBlue()),
+                                 1
+                             );
+                     });
+                     
+                     //Original Method
+                    /* match.getWorld().spawnParticle(
                          Particle.REDSTONE,
                          projectile.getLocation(),
                          0,
@@ -55,7 +67,7 @@ public class ProjectileTrailMatchModule extends MatchModule implements Listener 
                          rgbToParticle(color.getGreen()),
                          rgbToParticle(color.getBlue()),
                          1
-                     );
+                     );*/
                  }
              });
     }
@@ -67,10 +79,7 @@ public class ProjectileTrailMatchModule extends MatchModule implements Listener 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onProjectileLaunch(ProjectileLaunchEvent event) {
         match.player(event.getActor()).ifPresent(shooter -> {
-            final Projectile projectile = event.getEntity();            
-            boolean showTrail = PlayerSettings.getManager(shooter.getBukkit()).getValue(Settings.ARROWS, Boolean.class);
-                        
-            if(showTrail){
+            final Projectile projectile = event.getEntity();                                    
                 projectile.setMetadata(TRAIL_META, new FixedMetadataValue(PGM.get(), shooter.getParty().getFullColor()));
                 // Set critical metadata to false in order to remove default particle trail.
                 // The metadata will be restored just before the arrow hits something.
@@ -79,7 +88,6 @@ public class ProjectileTrailMatchModule extends MatchModule implements Listener 
                     arrow.setMetadata(CRITICAL_META, new FixedMetadataValue(PGM.get(), arrow.isCritical()));
                     arrow.setCritical(false);
                 }
-            }
         });
     }
 
