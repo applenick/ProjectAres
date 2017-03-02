@@ -39,6 +39,7 @@ import tc.oc.commons.bukkit.item.StringItemTag;
 import tc.oc.commons.core.chat.ChatUtils;
 import tc.oc.commons.core.chat.Component;
 import tc.oc.commons.core.formatting.StringUtils;
+import tc.oc.pgm.Config;
 import tc.oc.pgm.PGMTranslations;
 import tc.oc.pgm.blitz.BlitzModule;
 import tc.oc.pgm.classes.ClassMatchModule;
@@ -97,6 +98,7 @@ public class PickerMatchModule extends MatchModule implements Listener {
     private final boolean hasTeams;
     private final boolean hasClasses;
     private final boolean isBlitz;
+    private final boolean displayTeams;
 
     private final Set<MatchPlayer> picking = new HashSet<>();
 
@@ -106,6 +108,7 @@ public class PickerMatchModule extends MatchModule implements Listener {
         this.hasTeams = teamModule.isPresent();
         this.hasClasses = classModule.isPresent();
         this.isBlitz = blitzModule.filter(BlitzModule::isEnabled).isPresent();
+        this.displayTeams = Config.JoinOptions.displayTeams();
     }
 
     protected boolean settingEnabled(MatchPlayer player) {
@@ -301,7 +304,7 @@ public class PickerMatchModule extends MatchModule implements Listener {
 
         if(hand.getType() == Button.JOIN.material) {
             event.setCancelled(true);
-            if(canOpenWindow(player)) {
+            if(canOpenWindow(player) && displayTeams) {
                 showWindow(player);
             } else {
                 // If there is nothing to pick, just join immediately

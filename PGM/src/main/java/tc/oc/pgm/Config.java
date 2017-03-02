@@ -27,6 +27,13 @@ public class Config {
         return getConfiguration().getInt("minimum-players", 1);
     }
 
+    public static class JoinOptions{
+    	public static boolean displayTeams(){
+    		return getConfiguration().getBoolean("join.display-teams");
+    	}
+    }
+    
+    
     public static class Broadcast {
         public static boolean title() {
             return getConfiguration().getBoolean("broadcast.title", true);

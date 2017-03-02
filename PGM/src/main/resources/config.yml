@@ -135,6 +135,7 @@ join:
     overfill-ratio: 1.25      # Default value, XML overrides this
   requirements:
     minimum-kills: 0
+  display-teams: false        #Display teams in Join Picker to everyone when true, only those with perms if false
 
 minimum-players: 1
 
