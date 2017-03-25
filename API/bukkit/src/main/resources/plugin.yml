@@ -4,3 +4,5 @@ version: ${project.version}-${git.commit.id.abbrev}
 author: Overcast Network
 isolate: true
 softdepend: [Raven]
+depend:
+  - Lightning

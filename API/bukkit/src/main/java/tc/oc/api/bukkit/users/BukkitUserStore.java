@@ -3,13 +3,21 @@ package tc.oc.api.bukkit.users;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Stream;
+
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventBus;
+
+import com.applenick.Lightning.Lightning;
+import com.applenick.Lightning.users.ThunderUser;
+import com.applenick.Lightning.users.ThunderUsers;
+
 import tc.oc.api.bukkit.event.UserUpdateEvent;
 import tc.oc.api.bukkit.friends.OnlineFriends;
 import tc.oc.api.docs.User;
@@ -24,6 +32,7 @@ public class BukkitUserStore extends UserStore<Player> implements OnlinePlayers,
     @Inject private EventBus eventBus;
     @Inject private MainThreadExecutor executor;
     @Inject private UserService userService;
+    		
 
     @Override
     protected void updateUser(tc.oc.minecraft.api.entity.Player player, @Nullable User before, @Nullable User after) {
@@ -33,14 +42,33 @@ public class BukkitUserStore extends UserStore<Player> implements OnlinePlayers,
 
     @Override
     public boolean areFriends(Player a, UserId b) {
-        final User aUser = tryUser(a);
-        return aUser != null && aUser.friends().contains(b);
+    	ThunderUsers users = Lightning.get().getUsers();
+    	if(users != null){
+        	ThunderUser user = users.getThunderUser(a.getUniqueId());
+        	if(user != null){
+        		return user.areFriends(UUID.fromString(b.player_id()));
+        	}else{
+        		return false;
+        	}
+    	}
+    	Bukkit.getServer().getConsoleSender().sendMessage("LIGHTNING NOT FOUND - a idb");
+    	return false;
     }
 
     @Override
     public boolean areFriends(Player a, Player b) {
-        final User bUser = tryUser(b);
-        return bUser != null && areFriends(a, bUser);
+    	ThunderUsers users = Lightning.get().getUsers();
+    	if(users != null){
+        	ThunderUser user = users.getThunderUser(a.getUniqueId());
+        	if(user != null){
+        		return user.areFriends(b.getUniqueId());
+        	}else{
+        		return false;
+        	}
+    	}
+    	Bukkit.getServer().getConsoleSender().sendMessage("LIGHTNING NOT FOUND - ab");
+    	return false;
+
     }
 
     @Override

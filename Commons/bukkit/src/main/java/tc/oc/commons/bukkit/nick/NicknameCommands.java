@@ -1,21 +1,13 @@
 package tc.oc.commons.bukkit.nick;
 
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Stream;
+
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import com.google.common.base.Function;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TranslatableComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -27,12 +19,26 @@ import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
+
+import com.applenick.Lightning.Lightning;
+import com.applenick.Lightning.users.ThunderUser;
+import com.applenick.Lightning.users.ThunderUsers;
+import com.google.common.base.Function;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.sk89q.minecraft.util.commands.Command;
+import com.sk89q.minecraft.util.commands.CommandContext;
+import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.minecraft.util.commands.CommandPermissions;
+
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TranslatableComponent;
 import tc.oc.api.bukkit.users.OnlinePlayers;
 import tc.oc.api.docs.PlayerId;
 import tc.oc.api.docs.User;
 import tc.oc.api.docs.virtual.UserDoc;
 import tc.oc.api.exceptions.UnprocessableEntity;
-import tc.oc.minecraft.scheduler.SyncExecutor;
 import tc.oc.api.users.UserService;
 import tc.oc.commons.bukkit.chat.Audiences;
 import tc.oc.commons.bukkit.chat.NameStyle;
@@ -47,6 +53,7 @@ import tc.oc.commons.core.chat.Component;
 import tc.oc.commons.core.commands.CommandFutureCallback;
 import tc.oc.commons.core.commands.Commands;
 import tc.oc.commons.core.commands.ComponentCommandException;
+import tc.oc.minecraft.scheduler.SyncExecutor;
 
 @Singleton
 public class NicknameCommands implements Listener, Commands {
@@ -91,7 +98,7 @@ public class NicknameCommands implements Listener, Commands {
 
     @Override
     public void enable() {
-        final PermissionAttachment attachment = Bukkit.getConsoleSender().addAttachment(plugin);
+        /*final PermissionAttachment attachment = Bukkit.getConsoleSender().addAttachment(plugin);
         Stream.of(
             PERMISSION,
             PERMISSION_GET,
@@ -104,7 +111,7 @@ public class NicknameCommands implements Listener, Commands {
             final Permission permission = new Permission(name, PermissionDefault.FALSE);
             pluginManager.addPermission(permission);
             attachment.setPermission(permission, true);
-        });
+        });*/
     }
 
     private static boolean isSelf(CommandSender sender, @Nullable String username) {
@@ -123,20 +130,23 @@ public class NicknameCommands implements Listener, Commands {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    //Send our own fancy message via Lightning
+    /*@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void sendNickReminderOnLogin(UserLoginEvent event) {
-        if(event.getUser().nickname() != null) {
-            if(event.getPlayer().hasPermission(PERMISSION_SET)) {
-                audiences.get(event.getPlayer()).sendMessage(new TranslatableComponent(
-                    "nick.joinReminder",
-                    new Component("/nick", ChatColor.GOLD),
-                    new Component("/nick clear", ChatColor.GOLD)
-                ));
-            } else {
-                set(event.getUser(), null, true);
-            }
-        }
-    }
+    	ThunderUsers users = Lightning.get().getUsers();
+    	ThunderUser user = users.getThunderUser(event.getPlayer().getUniqueId());
+    	if(user.isDisguised() && user.getNickname() != null){
+    		if(event.getPlayer().hasPermission(PERMISSION_SET)) {
+    			audiences.get(event.getPlayer()).sendMessage(new TranslatableComponent(
+    					"nick.joinReminder",
+    					new Component("/nick", ChatColor.GOLD),
+    					new Component("/nick clear", ChatColor.GOLD)
+    					));
+    		} else {
+    			set(event.getUser(), null, true);
+    		}
+    	}
+    }*/
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void sendNickChangeMessage(PlayerIdentityChangeEvent event) {
@@ -147,7 +157,7 @@ public class NicknameCommands implements Listener, Commands {
         }
     }
 
-    /*@Command(aliases = {"nick" },
+    @Command(aliases = {"nick" },
              usage = "list | show [player] | set <nickname> [player] | clear [player] | <nickname> [player]",
              desc = "Show, set, or clear a nickname for yourself or another player. " +
                     "Changes will take effect the next time the player " +
@@ -191,7 +201,7 @@ public class NicknameCommands implements Listener, Commands {
                     break;
             }
         }
-    }*/
+    }
 
     public void list(final CommandSender sender) throws CommandException {
         CommandUtils.assertPermission(sender, PERMISSION_ANY_GET);
@@ -337,7 +347,22 @@ public class NicknameCommands implements Listener, Commands {
         if(reason != null) {
             return Futures.immediateFailedFuture(new ComponentCommandException(reason));
         }
-
+        
+        //Thunderstorm - Set Nickname via our API
+        ThunderUsers tsUsers = Lightning.get().getUsers();
+        ThunderUser tsUser = tsUsers.getThunderUser(UUID.fromString(playerId.player_id()));
+        boolean applied = immediate;
+        
+        
+        if(tsUser != null){
+        	tsUser.setNickname(nickname);
+        	if(nickname != null){
+            	tsUser.setDisguised(applied);
+        	}else{
+        		tsUser.setDisguised(false);
+        	}
+        }
+        
         return Futures.transform(
             userService.update(playerId, (UserDoc.Nickname) () -> nickname),
             (Function<User, User>) user -> {

@@ -40,6 +40,23 @@
             <version>1.9-SNAPSHOT</version>
         </dependency>
 
+		<dependency>
+			<groupId>com.applenick</groupId>
+			<artifactId>Lightning</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.bukkit</groupId>
+					<artifactId>bukkit</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>tc.oc</groupId>
+					<artifactId>sportbukkit-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>  
+        
+
 
         <!-- Testing -->
 

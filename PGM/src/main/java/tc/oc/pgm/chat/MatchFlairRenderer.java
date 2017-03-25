@@ -5,6 +5,10 @@ import javax.inject.Singleton;
 
 import org.bukkit.entity.Player;
 
+import com.applenick.Lightning.Lightning;
+import com.applenick.Lightning.users.ThunderUser;
+import com.applenick.Lightning.users.ThunderUsers;
+
 import net.md_5.bungee.api.ChatColor;
 import tc.oc.api.bukkit.users.BukkitUserStore;
 import tc.oc.api.minecraft.MinecraftService;
@@ -21,50 +25,54 @@ import tc.oc.pgm.match.MatchManager;
 @Singleton
 public class MatchFlairRenderer extends FlairRenderer {
 
-    private static final String MAPMAKER_FLAIR_LEGACY = ChatColor.BLUE + "\u25C8";
-    private static final String STAFF_FLAIR = "\u2756";
+	//TSPVP MapMakmaker flair
+	private static final String MAPMAKER_FLAIR_LEGACY = ChatColor.BLUE + "\u2733";
 
-    private final MatchManager matchManager;
+	private final MatchManager matchManager;
 
-    @Inject MatchFlairRenderer(MinecraftService minecraftService, BukkitUserStore userStore, MatchManager matchManager) {
-        super(minecraftService, userStore);
-        this.matchManager = matchManager;
-    }
+	@Inject MatchFlairRenderer(MinecraftService minecraftService, BukkitUserStore userStore, MatchManager matchManager) {
+		super(minecraftService, userStore);
+		this.matchManager = matchManager;
+	}
 
-    @Override
-    public String getLegacyName(Identity identity, NameType type) {
-        String name = super.getLegacyName(identity, type);
+	@Override
+	public String getLegacyName(Identity identity, NameType type) {
+		String name = super.getLegacyName(identity, type);
 
-        if(!type.style.contains(NameFlag.MAPMAKER)) return name;
+		if(!type.style.contains(NameFlag.MAPMAKER)) return name;
 
-        // If we ever have multiple simulataneous matches, the mapmaker flair will show
-        // in all matches, not just the one for the player's map. We can't avoid this
-        // without some way to render names differently in each match (which we could do).
-        for(Match match : matchManager.currentMatches()) {   
-        	        	
-            if(!match.isUnloaded()) {
-            	
-            	if(match.getMap().getInfo().isAuthor(identity.getPlayerId())){
-                    name = MAPMAKER_FLAIR_LEGACY + name;
-                    break;
-            	}
-            	
-            	//TS Start
-            	// Temp Work around until we implement our own Database into Commons
-            	
-            	if(identity.getPlayer() != null){
-            		Player player = identity.getPlayer();
-            		if(player.isOp()){
-            			
-            			name = STAFF_FLAIR + name;
-            			break;
-            		}
-            	}
-            }
-            
+		// If we ever have multiple simulataneous matches, the mapmaker flair will show
+		// in all matches, not just the one for the player's map. We can't avoid this
+		// without some way to render names differently in each match (which we could do).
+		for(Match match : matchManager.currentMatches()) {   
 
-        }
+			if(!match.isUnloaded()) {
+				Player player = identity.getPlayer();
 
-        return name;
-    }
+				if(match.getMap().getInfo().isAuthor(identity.getPlayerId())){
+					name = MAPMAKER_FLAIR_LEGACY + getFlairName(player, name);
+					break;
+				}
+
+				if(identity.getPlayer() != null){
+					name = getFlairName(player, name);
+					break;
+				}
+			}
+		}
+		return name;
+	}
+	
+	//Thunderstorm PvP - We use our own backend to fetch a ranks & their proper flair
+	//Only bug atm is new flairs update after a map cycle or user restarts their session
+	private String getFlairName(Player player, String name){
+		ThunderUsers users = Lightning.get().getUsers();
+		ThunderUser user = users.getThunderUser(player.getUniqueId());
+		if(user != null){
+			if(user.hasFlair() && !user.isDisguised()){
+				return user.getFlair() + name;
+			}
+		}
+		return name;
+	}
 }

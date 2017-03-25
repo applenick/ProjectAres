@@ -7,6 +7,8 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventBus;
@@ -15,6 +17,11 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+
+import com.applenick.Lightning.Lightning;
+import com.applenick.Lightning.users.ThunderUser;
+import com.applenick.Lightning.users.ThunderUsers;
+
 import tc.oc.api.bukkit.friends.OnlineFriends;
 import tc.oc.api.bukkit.users.BukkitUserStore;
 import tc.oc.api.bukkit.users.OnlinePlayers;
@@ -168,8 +175,26 @@ public class IdentityProviderImpl implements IdentityProvider, Listener, PluginF
      */
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void applyNicknameOnLogin(UserLoginEvent event) {
-        if(event.getUser().nickname() != null) {
-            applyNickname(event.getPlayer(), null, event.getUser().nickname());
+    	ThunderUsers users = Lightning.get().getUsers();
+    	ThunderUser user = users.getThunderUser(event.getUser().uuid());
+        Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + "WARNING - APPLY NICK ON LOGIN HAS RUN");
+        if(user != null && user.isDisguised() || user != null && user.hasDisguseQueued()) {
+        	
+        	if(user.hasDisguseQueued()){
+        		user.setQueueDisguise(false);
+        		user.setDisguised(true);
+        	}
+        	
+            applyNickname(event.getPlayer(), null, user.getNickname());
+            Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + "APPLIED NICKNAME FOR - " + user.getName());
+        }else{
+        	
+        	if(user != null){
+                Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + "WARNING - NICKNAME FOR - " + user.getName() + " has either a NULL TSUser");
+        	}else{
+                Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + "WARNING - NICKNAME FOR - " + user.getName() + " is not disguised!");
+        	}
+        	
         }
     }
 
