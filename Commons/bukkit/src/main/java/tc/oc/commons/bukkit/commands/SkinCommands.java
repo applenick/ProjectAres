@@ -38,8 +38,18 @@ public class SkinCommands implements NestedCommands, PluginFacet {
 
     @Command(aliases = {"reset"},
              desc = "Reset a player's skin to their real one",
-             usage = "[player]")
+             usage = "[player]",
+             flags = "a"
+    		)
     public void reset(CommandContext args, CommandSender sender) throws CommandException {
+    	if(args.hasFlag('a')){
+    		for(Player p : sender.getServer().getOnlinePlayers()){
+    			p.setSkin(null);
+    		}
+    		sender.sendMessage(ChatColor.WHITE + "All online player skins have been reset.");
+    		return;
+    	}
+    	
         Player player = CommandUtils.getPlayerOrSelf(args, sender, 0);
 
         player.setSkin(null);
@@ -49,19 +59,29 @@ public class SkinCommands implements NestedCommands, PluginFacet {
     @Command(aliases = {"clone"},
              desc = "Clone one player's skin to another",
              usage = "<source> [target]",
-             flags = "u")
+             flags = "au")
     public void clone(CommandContext args, CommandSender sender) throws CommandException {
         Player source = CommandUtils.getPlayer(args, sender, 0);
-        Player target = CommandUtils.getPlayerOrSelf(args, sender, 1);
-
+        
+        boolean all = args.hasFlag('a');
         boolean unsigned = args.hasFlag('u');
+        
         Skin skin = source.getSkin();
         if(unsigned) {
             skin = new Skin(skin.getData(), null);
         }
-
-        target.setSkin(skin);
-        sender.sendMessage(ChatColor.WHITE + "Cloned " + source.getDisplayName(sender) + ChatColor.WHITE + "'s skin to " + target.getDisplayName(sender));
+        
+        if(all){
+        	for(Player p : sender.getServer().getOnlinePlayers()){
+        		p.setSkin(skin);
+        	}
+            sender.sendMessage(ChatColor.WHITE + "Cloned " + source.getDisplayName(sender) + ChatColor.WHITE + "'s skin to all online players");
+        }else{
+            Player target = CommandUtils.getPlayerOrSelf(args, sender, 1);
+            target.setSkin(skin);
+            sender.sendMessage(ChatColor.WHITE + "Cloned " + source.getDisplayName(sender) + ChatColor.WHITE + "'s skin to " + target.getDisplayName(sender));
+        }
+        
     }
 
     @Command(aliases = {"none"},
