@@ -1,19 +1,28 @@
 package tc.oc.commons.bukkit.commands;
 
+import javax.inject.Inject;
+
+import org.bukkit.ChatColor;
+import org.bukkit.Skin;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.NestedCommand;
-import org.bukkit.ChatColor;
-import org.bukkit.Skin;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+
+import tc.oc.api.bukkit.users.OnlinePlayers;
+import tc.oc.api.minecraft.users.UserStore;
 import tc.oc.commons.core.commands.Commands;
 import tc.oc.commons.core.commands.NestedCommands;
 import tc.oc.commons.core.plugin.PluginFacet;
 
 public class SkinCommands implements NestedCommands, PluginFacet {
+	
+	@Inject private OnlinePlayers users;
+	
     public static class Parent implements Commands, PluginFacet {
         @Command(
             aliases = {"skin"},
@@ -42,8 +51,8 @@ public class SkinCommands implements NestedCommands, PluginFacet {
              flags = "a"
     		)
     public void reset(CommandContext args, CommandSender sender) throws CommandException {
-    	if(args.hasFlag('a')){
-    		for(Player p : sender.getServer().getOnlinePlayers()){
+    	if(args.hasFlag('a')){    		
+    		for(Player p : users.all()){
     			p.setSkin(null);
     		}
     		sender.sendMessage(ChatColor.WHITE + "All online player skins have been reset.");
@@ -72,7 +81,7 @@ public class SkinCommands implements NestedCommands, PluginFacet {
         }
         
         if(all){
-        	for(Player p : sender.getServer().getOnlinePlayers()){
+        	for(Player p : users.all()){
         		p.setSkin(skin);
         	}
             sender.sendMessage(ChatColor.WHITE + "Cloned " + source.getDisplayName(sender) + ChatColor.WHITE + "'s skin to all online players");
