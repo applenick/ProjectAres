@@ -114,11 +114,13 @@ public class MatchFormatter {
             }
         });
 
-        audience.sendMessage(new Component(ChatColor.DARK_PURPLE)
+       /* Remove URL link as we do not plan on supporting this - TSPVP
+        * audience.sendMessage(new Component(ChatColor.DARK_PURPLE)
                                  .translate("misc.link")
                                  .extra(": ")
                                  .link(match.getUrl())
                                  .hoverEvent(tip));
+        */
 
         if(player != null) match.module(EngagementMatchModule.class).ifPresent(emm -> {
             emm.sendPreMatchFeedback(player);

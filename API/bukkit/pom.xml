@@ -46,6 +46,10 @@
                     <groupId>tc.oc</groupId>
                     <artifactId>sportbukkit-api</artifactId>
                 </exclusion>
+                <exclusion>
+					<groupId>tc.oc</groupId>
+					<artifactId>sportbukkit</artifactId>
+				</exclusion>
             </exclusions>
         </dependency>  
                      

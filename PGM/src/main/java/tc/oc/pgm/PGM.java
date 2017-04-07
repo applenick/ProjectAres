@@ -86,12 +86,6 @@ public final class PGM extends JavaPlugin {
         return mapdevLogger;
     }
 
-    private PollManager pollManager;
-
-    public static PollManager getPollManager() {
-        return pgm == null ? null : pgm.pollManager;
-    }
-
     public MapLibrary getMapLibrary() {
         return mapLibrary;
     }
@@ -127,8 +121,6 @@ public final class PGM extends JavaPlugin {
             this.getServer().shutdown();
             return;
         }
-
-        this.pollManager = new PollManager(this);
 
         this.registerListeners();
 
@@ -183,7 +175,6 @@ public final class PGM extends JavaPlugin {
     private void setupCommands() {
         commands.register(MapCommands.class);
         commands.register(ChannelCommands.class);
-        commands.register(PollCommands.class);
         commands.register(RotationEditCommands.RotationEditParent.class);
         commands.register(RotationControlCommands.RotationControlParent.class);
         commands.register(TimeLimitCommands.class);
@@ -194,7 +185,6 @@ public final class PGM extends JavaPlugin {
     }
 
     private void registerListeners() {
-        this.registerEvents(new PollListener(this.pollManager, this.matchManager));
         this.registerEvents(new FormattingListener());
         this.registerEvents(new CraftingProtect());
         this.registerEvents(new ObjectivesFireworkListener());

@@ -1,5 +1,7 @@
 package tc.oc.pgm.module;
 
+import com.applenick.Lightning.mapvote.MapVotingMatchModule;
+
 import tc.oc.commons.core.inject.HybridManifest;
 import tc.oc.pgm.api.EngagementMatchModule;
 import tc.oc.pgm.api.MatchPublishingMatchModule;
@@ -42,6 +44,7 @@ public class MatchModulesManifest extends HybridManifest {
         install(new ViewInventoryMatchModule.Manifest());
         install(new JoinMatchModule.Manifest());
         install(new CycleMatchModule.Manifest());
+        install(new MapVotingMatchModule.Manifest());
 
         install(new MatchModuleFixtureManifest<EventFilterMatchModule>(){});
         install(new MatchModuleFixtureManifest<MultiTradeMatchModule>(){});

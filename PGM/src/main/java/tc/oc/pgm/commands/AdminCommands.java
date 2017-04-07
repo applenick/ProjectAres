@@ -10,8 +10,11 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.Console;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
 import java.time.Duration;
 import tc.oc.api.docs.virtual.ServerDoc;
+import tc.oc.commons.bukkit.channels.AdminChannel;
 import tc.oc.commons.core.commands.Commands;
 import tc.oc.commons.core.commands.TranslatableCommandException;
 import tc.oc.commons.core.restart.RestartManager;
@@ -30,12 +33,14 @@ import tc.oc.pgm.rotation.RotationState;
 
 public class AdminCommands implements Commands {
     
+    private final AdminChannel adminChannel;
     private final RestartManager restartManager;
     private final RestartListener restartListener;
 
-    @Inject AdminCommands(RestartManager restartManager, RestartListener restartListener) {
+    @Inject AdminCommands(RestartManager restartManager, RestartListener restartListener, AdminChannel adminChannel) {
         this.restartManager = restartManager;
         this.restartListener = restartListener;
+        this.adminChannel = adminChannel;
     }
 
     @Command(
@@ -141,7 +146,13 @@ public class AdminCommands implements Commands {
             restartManager.cancelRestart();
             sender.sendMessage(ChatColor.GREEN + PGMTranslations.get().t("command.admin.cancelRestart.restartUnqueued", sender));
         }
-        sender.sendMessage(ChatColor.DARK_PURPLE + PGMTranslations.get().t("command.admin.set.success", sender, ChatColor.GOLD + mm.getNextMap().getInfo().name + ChatColor.DARK_PURPLE));
+        
+        if(sender instanceof Player){
+            adminChannel.broadcast(CommandUtils.senderToMatchPlayer(sender).getDisplayName() + ChatColor.DARK_PURPLE + " has set " + ChatColor.GOLD + mm.getNextMap().getInfo().name + ChatColor.DARK_PURPLE + " as the next map");
+        }else{
+            sender.sendMessage(ChatColor.DARK_PURPLE + PGMTranslations.get().t("command.admin.set.success", sender, ChatColor.GOLD + mm.getNextMap().getInfo().name + ChatColor.DARK_PURPLE));
+        }
+        
         return null;
     }
 

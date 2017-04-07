@@ -53,6 +53,10 @@
 					<groupId>tc.oc</groupId>
 					<artifactId>sportbukkit-api</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>tc.oc</groupId>
+					<artifactId>sportbukkit</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>  
         
@@ -96,6 +100,7 @@
                                 <includes>
                                     <include>org.jdom:jdom2</include>
                                     <include>org.jdom:jdom2-contrib</include>
+                                    <include>com.applenick:Lightning</include>
                                 </includes>
                             </artifactSet>
                         </configuration>

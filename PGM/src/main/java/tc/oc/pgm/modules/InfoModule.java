@@ -11,6 +11,8 @@ import java.util.logging.Logger;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Range;
 import com.google.inject.Provides;
+
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Difficulty;
 import org.bukkit.World.Environment;
@@ -19,6 +21,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import tc.oc.api.docs.SemanticVersion;
 import tc.oc.api.docs.virtual.MapDoc;
+import tc.oc.api.docs.virtual.MapDoc.Gamemode;
 import tc.oc.commons.core.chat.Component;
 import tc.oc.pgm.features.GamemodeFeature;
 import tc.oc.pgm.map.Contributor;
@@ -56,6 +59,19 @@ public class InfoModule implements MapModule, WorldConfigurator {
 
     public Set<MapDoc.Gamemode> getGamemodes() {
         return info.gamemodes.isEmpty() ? gamemodes : info.gamemodes;
+    }
+    
+    public String getGamemodeTag(){
+    	String gamemode = "";
+	     int count = 0;
+	     for(Gamemode gm : gamemodes){
+	    	 //Exclude mixed gamemode; just to make things shorter
+	    	 if(!gm.equals(Gamemode.mixed)){
+	    		 gamemode =  gamemode + (count != 0 ? " " : "") + gm.toString().toUpperCase();
+	    		 count++;
+	    	 }
+	     }            	
+	     return ChatColor.RED + ChatColor.BOLD.toString() + gamemode;
     }
 
     public Range<Integer> getGlobalPlayerLimits() {
