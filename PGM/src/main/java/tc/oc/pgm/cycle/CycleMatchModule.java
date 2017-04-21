@@ -8,6 +8,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
+import com.applenick.Lightning.mapvote.MapVotingMatchModule;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import net.md_5.bungee.api.ChatColor;
@@ -74,6 +75,10 @@ public class CycleMatchModule extends MatchModule implements Listener {
 
     private boolean autoCycle = true;
 
+    public void setAutoCycle(boolean cycle){
+    	this.autoCycle = cycle;
+    }
+    
     public CycleConfig getConfig() {
         return config;
     }
@@ -197,7 +202,8 @@ public class CycleMatchModule extends MatchModule implements Listener {
     }
 
     private void checkMatchEndCycle() {
-        if(canAutoCycle() && match.isFinished()) {
+    	MapVotingMatchModule mvm = this.getMatch().getMatchModule(MapVotingMatchModule.class);
+        if(canAutoCycle() && match.isFinished() && !mvm.isEnabled() && !mvm.shouldSkip()) {
             final CycleConfig.Auto autoConfig = config.matchEnd();
             if(autoConfig.enabled()) {
                 startCountdown(autoConfig.countdown());
@@ -206,7 +212,8 @@ public class CycleMatchModule extends MatchModule implements Listener {
     }
 
     private void checkEmptyServerCycle() {
-        if(canAutoCycle() && match.isRunning() && match.getParticipatingPlayers().isEmpty()) {
+    	MapVotingMatchModule mvm = this.getMatch().getMatchModule(MapVotingMatchModule.class);
+        if(canAutoCycle() && match.isRunning() && match.getParticipatingPlayers().isEmpty() && !mvm.isEnabled() && !mvm.shouldSkip()) {
             final CycleConfig.Auto autoConfig = config.matchEmpty();
             if(autoConfig.enabled()) {
                 logger.info("Cycling due to empty match");

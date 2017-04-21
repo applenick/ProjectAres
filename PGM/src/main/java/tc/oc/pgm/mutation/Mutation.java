@@ -24,6 +24,7 @@ import tc.oc.pgm.mutation.types.kit.PotionMutation;
 import tc.oc.pgm.mutation.types.kit.ProjectileMutation;
 import tc.oc.pgm.mutation.types.kit.StealthMutation;
 import tc.oc.pgm.mutation.types.other.BlitzMutation;
+import tc.oc.pgm.mutation.types.other.FireworkMutation;
 import tc.oc.pgm.mutation.types.other.RageMutation;
 import tc.oc.pgm.mutation.types.targetable.ApocalypseMutation;
 import tc.oc.pgm.mutation.types.targetable.BomberMutation;
@@ -50,7 +51,8 @@ public enum Mutation {
     MOBS       (MobsMutation.class),
     LIGHTNING  (LightningMutation.class),
     BOMBER     (BomberMutation.class),
-    APOCALYPSE (ApocalypseMutation.class);
+    APOCALYPSE (ApocalypseMutation.class),
+    FIREWORK   (FireworkMutation.class);
 
     public static final String TYPE_KEY = "mutation.type.";
     public static final String DESCRIPTION_KEY = ".desc";

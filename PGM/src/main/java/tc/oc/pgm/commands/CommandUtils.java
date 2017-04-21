@@ -26,6 +26,10 @@ public class CommandUtils {
     public static List<String> completeMapName(String prefix) {
         return StringUtils.complete(prefix, PGM.get().getMapLibrary().getMapNames());
     }
+    
+    public static List<String> completeMapName(String prefix, List<String> mapSelection){
+    	return StringUtils.complete(prefix, mapSelection);
+    }
 
     public static PGMMap getMap(String search) {
         final MapLibrary library = PGM.get().getMapLibrary();

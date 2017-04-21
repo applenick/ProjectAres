@@ -12,7 +12,7 @@ import tc.oc.pgm.polls.*;
 import com.sk89q.minecraft.util.commands.*;
 
 public class PollCommands {
-    @Command(
+    /*@Command(
         aliases = {"poll"},
         desc = "Poll commands",
         min = 1,
@@ -32,7 +32,7 @@ public class PollCommands {
     @CommandPermissions("poll.vote")
     public static void vote(CommandContext args, CommandSender sender) throws CommandException {
         Player voter = tc.oc.commons.bukkit.commands.CommandUtils.senderToPlayer(sender);
-        Poll currentPoll = PGM.getPollManager().getPoll();
+        //Poll currentPoll = PGM.getPollManager().getPoll();
         if(currentPoll != null) {
             if(args.getString(0).equalsIgnoreCase("yes")) {
                 currentPoll.voteFor(voter.getName());
@@ -115,5 +115,5 @@ public class PollCommands {
             pollManager.startPoll(poll);
             Bukkit.getServer().broadcastMessage(ChatColor.RED + poll.getInitiator() + ChatColor.YELLOW + " has started a poll to " + poll.getActionString(ChatColor.YELLOW));
         }
-    }
+    }*/
 }

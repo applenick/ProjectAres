@@ -11,6 +11,7 @@ import tc.oc.commons.core.chat.Components;
 import tc.oc.commons.core.collection.WeakHashSet;
 import tc.oc.commons.core.util.TimeUtils;
 import tc.oc.pgm.doublejump.DoubleJumpKit;
+import tc.oc.pgm.kits.FreeItemKit;
 import tc.oc.pgm.kits.ItemKit;
 import tc.oc.pgm.kits.KitNode;
 import tc.oc.pgm.kits.KitPlayerFacet;
@@ -31,10 +32,11 @@ import java.util.stream.Stream;
 public class ElytraMutation extends KitMutation {
 
     final static ItemKit ELYTRA = new SlotItemKit(item(Material.ELYTRA), Slot.Armor.forType(ArmorType.CHESTPLATE));
+    final static ItemKit FIREWORK = new FreeItemKit(item(Material.FIREWORK, 2));
     final static DoubleJumpKit JUMP = new DoubleJumpKit(true, 6f, Duration.ofSeconds(30), true);
 
     public ElytraMutation(Match match) {
-        super(match, true, ELYTRA, JUMP);
+        super(match, true, ELYTRA, JUMP, FIREWORK);
     }
 
     @Override

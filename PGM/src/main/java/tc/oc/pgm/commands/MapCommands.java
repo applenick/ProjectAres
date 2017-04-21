@@ -1,6 +1,7 @@
 package tc.oc.pgm.commands;
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,6 +22,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TranslatableComponent;
 import org.bukkit.command.CommandSender;
 import tc.oc.api.docs.virtual.MapDoc;
+import tc.oc.api.docs.virtual.MapDoc.Gamemode;
 import tc.oc.api.util.Permissions;
 import tc.oc.commons.bukkit.chat.BukkitAudiences;
 import tc.oc.commons.bukkit.chat.NameStyle;
@@ -39,6 +41,7 @@ import tc.oc.pgm.map.Contributor;
 import tc.oc.pgm.map.MapInfo;
 import tc.oc.pgm.map.PGMMap;
 import tc.oc.pgm.match.MatchManager;
+import tc.oc.pgm.match.MatchPlayer;
 import tc.oc.pgm.match.Party;
 import tc.oc.pgm.modules.InfoModule;
 import tc.oc.pgm.rotation.RotationManager;
@@ -51,17 +54,30 @@ public class MapCommands {
         aliases = {"maplist", "maps", "ml"},
         desc = "Shows the maps that are currently loaded",
         usage = "[page]",
+        flags = "g",
         min = 0,
         max = 1,
         help = "Shows all the maps that are currently loaded including ones that are not in the rotation."
     )
     @CommandPermissions("pgm.maplist")
     public static void maplist(CommandContext args, final CommandSender sender) throws CommandException {
-        final Set<PGMMap> maps = ImmutableSortedSet.copyOf(new PGMMap.DisplayOrder(), PGM.getMatchManager().getMaps());
-
+    	final Set<PGMMap> maps = ImmutableSortedSet.copyOf(new PGMMap.DisplayOrder(), PGM.getMatchManager().getMaps());
+    	final boolean displayGamemode = args.hasFlag('g');
+                
         new PrettyPaginatedResult<PGMMap>(PGMTranslations.get().t("command.map.mapList.title", sender)) {
             @Override public String format(PGMMap map, int index) {
-                return (index + 1) + ". " + map.getInfo().getShortDescription(sender);
+            	 final InfoModule infoModule = map.getContext().needModule(InfoModule.class);
+                 String gamemode = "";
+                 Set<MapDoc.Gamemode> gamemodes = infoModule.getGamemodes();
+                 int count = 0;
+                 for(Gamemode gm : gamemodes){
+                	 if(!gm.equals(Gamemode.mixed)){
+                		 gamemode =  gamemode + (count != 0 ? " " : "") + gm.toString();
+                		 count++;
+                	 }
+                	 
+                 }            	
+                return (index + 1) + ". " + (displayGamemode && !gamemode.equalsIgnoreCase("") ? "[" + ChatColor.DARK_PURPLE + ChatColor.BOLD.toString() + gamemode.toUpperCase() + ChatColor.WHITE + "] " : "") + map.getInfo().getShortDescription(sender);
             }
         }.display(new BukkitWrappedCommandSender(sender), maps, args.getInteger(0, 1) /* page */);
     }
