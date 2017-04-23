@@ -12,6 +12,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 
+import com.applenick.Lightning.utils.ThunderUtils;
+
 import tc.oc.commons.core.random.RandomUtils;
 import tc.oc.pgm.events.MatchPlayerDeathEvent;
 import tc.oc.pgm.fireworks.FireworkUtil;
@@ -43,7 +45,7 @@ public class FireworkMutation extends MutationModule.Impl {
 	
 		
 	private void playRandomFirework(Location loc){
-		FireworkUtil.spawnFirework(loc, getRandomColor(), 0);
+		ThunderUtils.instantFirework(loc, getRandomColor());
 	}
 	
 	@EventHandler
