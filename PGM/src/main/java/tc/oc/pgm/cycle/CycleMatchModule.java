@@ -203,11 +203,13 @@ public class CycleMatchModule extends MatchModule implements Listener {
 
     private void checkMatchEndCycle() {
     	MapVotingMatchModule mvm = this.getMatch().getMatchModule(MapVotingMatchModule.class);
-        if(canAutoCycle() && match.isFinished() && !mvm.isEnabled() && !mvm.shouldSkip()) {
-            final CycleConfig.Auto autoConfig = config.matchEnd();
-            if(autoConfig.enabled()) {
-                startCountdown(autoConfig.countdown());
-            }
+        if(canAutoCycle() && match.isFinished()) {
+        	if(!mvm.isEnabled() || mvm.shouldSkip()){
+                final CycleConfig.Auto autoConfig = config.matchEnd();
+                if(autoConfig.enabled()) {
+                    startCountdown(autoConfig.countdown());
+                }
+        	}
         }
     }
 

@@ -3,6 +3,7 @@ package tc.oc.pgm.commands;
 import java.util.List;
 import javax.inject.Inject;
 
+import com.applenick.Lightning.mapvote.MapVotingMatchModule;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -129,6 +130,7 @@ public class AdminCommands implements Commands {
     )
     @CommandPermissions("pgm.next.set")
     public List<String> setnext(CommandContext args, CommandSender sender) throws CommandException {
+    	MapVotingMatchModule mvm = CommandUtils.getMatchModule(MapVotingMatchModule.class, sender);
         final String mapName = args.argsLength() > 0 ? args.getJoinedStrings(0) : "";
         if(args.getSuggestionContext() != null) {
             return CommandUtils.completeMapName(mapName);
@@ -145,6 +147,10 @@ public class AdminCommands implements Commands {
         if (restartQueued) {
             restartManager.cancelRestart();
             sender.sendMessage(ChatColor.GREEN + PGMTranslations.get().t("command.admin.cancelRestart.restartUnqueued", sender));
+        }
+        
+        if(mvm.isEnabled()){
+        	mvm.skipVoting();
         }
         
         if(sender instanceof Player){
