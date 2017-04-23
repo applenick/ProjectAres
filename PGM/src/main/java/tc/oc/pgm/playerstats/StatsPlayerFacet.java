@@ -8,6 +8,10 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TranslatableComponent;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+
+import com.applenick.Lightning.Lightning;
+import com.applenick.Lightning.users.ThunderUser;
+
 import tc.oc.commons.bukkit.event.targeted.TargetedEventHandler;
 import tc.oc.commons.core.chat.Component;
 import tc.oc.commons.core.scheduler.Task;
@@ -49,25 +53,44 @@ public class StatsPlayerFacet implements MatchPlayerFacet, Listener {
         if (task != null) {
             task.cancel();
         }
-        task = scheduler.createRepeatingTask(1, 1, new Runnable() {
+        
+        StatSettings.StatTypes statType = settings.getValue(StatSettings.STAT_TYPE, StatSettings.StatTypes.class);
+        
+        int matchKills  = statsUserFacet.lifeKills();
+        int totalKills  = statsUserFacet.matchKills();
+        int totalDeaths = statsUserFacet.deaths();
+        
+        if(statType == StatSettings.StatTypes.GLOBAL){
+        	ThunderUser user = Lightning.get().getUsers().getThunderUser(player.getBukkit().getUniqueId());
+        	if(user != null){
+            	totalKills = user.getKills();
+            	totalDeaths = user.getDeaths();
+        	}
+        }
+        
+        sendStats(matchKills, totalKills, totalDeaths, (statType == StatSettings.StatTypes.MATCH));
+    }
+
+    protected void sendStats(int matchKills, int kills, int deaths, boolean match){
+    	task = scheduler.createRepeatingTask(1, 1, new Runnable() {
             int ticks = DISPLAY_TICKS;
             @Override
             public void run() {
                 if (--ticks > 0) {
-                    player.sendHotbarMessage(getMessage());
+                    player.sendHotbarMessage(getMessage(matchKills, kills, deaths, match));
                 } else {
                     delete();
                 }
             }
         });
     }
-
-    protected TranslatableComponent getMessage() {
-        TranslatableComponent component = new TranslatableComponent("stats.hotbar",
-                new Component(statsUserFacet.matchKills(), ChatColor.GREEN),
-                new Component(statsUserFacet.lifeKills(), ChatColor.GREEN),
-                new Component(statsUserFacet.deaths(), ChatColor.RED),
-                new Component(FORMAT.format((double) statsUserFacet.matchKills() / Math.max(statsUserFacet.deaths(), 1)), ChatColor.AQUA));
+    
+    protected TranslatableComponent getMessage(int matchKills, int kills, int deaths, boolean match) {
+        TranslatableComponent component = new TranslatableComponent((match ? "stats.hotbar.match" : "stats.hotbar.global"),
+                new Component(matchKills, ChatColor.GREEN),
+                new Component(kills, ChatColor.GREEN),
+                new Component(deaths, ChatColor.RED),
+                new Component(FORMAT.format((double) kills / Math.max(deaths, 1)), ChatColor.AQUA));
         component.setBold(true);
         return component;
     }

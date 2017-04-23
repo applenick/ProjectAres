@@ -10,7 +10,9 @@ public class StatsManifest extends HybridManifest implements MatchBinders {
 
     @Override
     protected void configure() {
-        new SettingBinder(publicBinder()).addBinding().toInstance(StatSettings.STATS);
+    	SettingBinder settings = new SettingBinder(publicBinder());
+    	settings.addBinding().toInstance(StatSettings.STATS);
+    	settings.addBinding().toInstance(StatSettings.STAT_TYPE);
         installPlayerModule(binder -> new MatchPlayerFacetBinder(binder).register(StatsPlayerFacet.class));
         installUserModule(binder -> new MatchUserFacetBinder(binder).register(StatsUserFacet.class));
     }
