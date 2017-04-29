@@ -56,7 +56,7 @@ public class StatsPlayerFacet implements MatchPlayerFacet, Listener {
         
         StatSettings.StatTypes statType = settings.getValue(StatSettings.STAT_TYPE, StatSettings.StatTypes.class);
         
-        int matchKills  = statsUserFacet.lifeKills();
+        int lifeKills  = statsUserFacet.lifeKills();
         int totalKills  = statsUserFacet.matchKills();
         int totalDeaths = statsUserFacet.deaths();
         
@@ -68,16 +68,16 @@ public class StatsPlayerFacet implements MatchPlayerFacet, Listener {
         	}
         }
         
-        sendStats(matchKills, totalKills, totalDeaths, (statType == StatSettings.StatTypes.MATCH));
+        sendStats(lifeKills, totalKills, totalDeaths, (statType == StatSettings.StatTypes.MATCH));
     }
 
-    protected void sendStats(int matchKills, int kills, int deaths, boolean match){
+    protected void sendStats(int lifeKills, int kills, int deaths, boolean match){
     	task = scheduler.createRepeatingTask(1, 1, new Runnable() {
             int ticks = DISPLAY_TICKS;
             @Override
             public void run() {
                 if (--ticks > 0) {
-                    player.sendHotbarMessage(getMessage(matchKills, kills, deaths, match));
+                    player.sendHotbarMessage(getMessage(lifeKills, kills, deaths, match));
                 } else {
                     delete();
                 }
@@ -85,10 +85,10 @@ public class StatsPlayerFacet implements MatchPlayerFacet, Listener {
         });
     }
     
-    protected TranslatableComponent getMessage(int matchKills, int kills, int deaths, boolean match) {
-        TranslatableComponent component = new TranslatableComponent((match ? "stats.hotbar.match" : "stats.hotbar.global"),
-                new Component(matchKills, ChatColor.GREEN),
+    protected TranslatableComponent getMessage(int lifeKills, int kills, int deaths, boolean match) {
+        TranslatableComponent component = new TranslatableComponent("stats.hotbar",
                 new Component(kills, ChatColor.GREEN),
+                new Component(lifeKills, ChatColor.GREEN),
                 new Component(deaths, ChatColor.RED),
                 new Component(FORMAT.format((double) kills / Math.max(deaths, 1)), ChatColor.AQUA));
         component.setBold(true);
