@@ -1,5 +1,6 @@
 package tc.oc.pgm;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -10,6 +11,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.applenick.Lightning.Lightning;
+import com.google.common.collect.Lists;
+
 import tc.oc.api.util.Permissions;
 import tc.oc.commons.bukkit.inject.BukkitPluginManifest;
 import tc.oc.commons.bukkit.inventory.Slot;
@@ -130,6 +135,11 @@ public final class PGM extends JavaPlugin {
                 getLogger().severe("Failed to load an initial match, shutting down");
                 getServer().shutdown();
             }
+            
+            //After everything enables & map cycles
+            List<String> rotationNames = Lists.newArrayList();
+            this.matchManager.getRotationManager().getRotation().getMaps().forEach(map -> rotationNames.add(map.getName()));
+            Lightning.get().getMapVoteManager().addAllRotationMaps(rotationNames);
         }, 0);
 
         if(Config.Broadcast.periodic()) {
@@ -150,6 +160,7 @@ public final class PGM extends JavaPlugin {
             this.matchTabManager = new MatchTabManager(this);
             this.matchTabManager.enable();
         }
+        
 
         // Would rather configure this with a Guice binding, but we can't as long as
         // PGM modules are installed on lobby servers, because the bindings will conflict.
