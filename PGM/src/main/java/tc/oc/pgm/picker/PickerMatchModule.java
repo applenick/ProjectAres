@@ -255,7 +255,7 @@ public class PickerMatchModule extends MatchModule implements Listener {
     public void join(PlayerJoinMatchEvent event) {
         final MatchPlayer player = event.getPlayer();
         player.nextTick(() -> {
-            if(settingEnabled(player) && canOpenWindow(player)) {
+            if(settingEnabled(player) && canOpenWindow(player) && displayTeams) {
                 showWindow(player);
             }
         });

@@ -48,6 +48,7 @@ public class DefaultPermissions {
                 .put("pgm.class.select"        , true)
                 .put("pgm.join"                , true)
                 .put("pgm.myteam"              , true)
+                .put("mutation.list"           , true)
                 .build();
 
         OBSERVER_PERMISSIONS = new ImmutableMap.Builder<String, Boolean>()
