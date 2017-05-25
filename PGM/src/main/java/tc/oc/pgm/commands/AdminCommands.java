@@ -4,6 +4,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import com.applenick.Lightning.mapvote.MapVotingMatchModule;
+import com.applenick.Lightning.matchs.RecentMatchType;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -151,6 +152,7 @@ public class AdminCommands implements Commands {
         
         if(mvm.isEnabled()){
         	mvm.skipVoting();
+        	mvm.getRecentMatchManager().setCurrentMapType(RecentMatchType.SET_NEXT);
         }
         
         if(sender instanceof Player){

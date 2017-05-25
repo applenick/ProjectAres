@@ -134,12 +134,7 @@ public final class PGM extends JavaPlugin {
             if(PGM.this.matchManager.cycleToNext(null, true, true) == null) {
                 getLogger().severe("Failed to load an initial match, shutting down");
                 getServer().shutdown();
-            }
-            
-            //After everything enables & map cycles
-            List<String> rotationNames = Lists.newArrayList();
-            this.matchManager.getRotationManager().getRotation().getMaps().forEach(map -> rotationNames.add(map.getName()));
-            Lightning.get().getMapVoteManager().addAllRotationMaps(rotationNames);
+            }            
         }, 0);
 
         if(Config.Broadcast.periodic()) {
