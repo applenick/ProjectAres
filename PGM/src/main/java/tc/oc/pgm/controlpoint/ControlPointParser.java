@@ -95,6 +95,7 @@ public final class ControlPointParser implements FeatureDefinitionParser<Control
         float pointsPerSecond = XMLUtils.parseNumber(elControlPoint.getAttribute("points"), Float.class, 1f);
         float pointsGrowth = XMLUtils.parseNumber(elControlPoint.getAttribute("points-growth"), Float.class, Float.POSITIVE_INFINITY);
         boolean showProgress = XMLUtils.parseBoolean(elControlPoint.getAttribute("show-progress"), koth);
+        boolean announce = XMLUtils.parseBoolean(elControlPoint.getAttribute("announce"), false);
         boolean visible = XMLUtils.parseBoolean(elControlPoint.getAttribute("show"), true);
         Boolean required = XMLUtils.parseBoolean(elControlPoint.getAttribute("required"), null);
 
@@ -110,7 +111,7 @@ public final class ControlPointParser implements FeatureDefinitionParser<Control
             progressDisplayRegion, ownerDisplayRegion, visualMaterials,
             capturableDisplayBeacon == null ? null : capturableDisplayBeacon.toBlockVector(),
             timeToCapture, timeMultiplier, recoveryRate, decayRate, initialOwner, captureCondition,
-            neutralState, permanent, pointsOwned, pointsPerSecond, pointsGrowth, showProgress
+            neutralState, permanent, pointsOwned, pointsPerSecond, pointsGrowth, showProgress, announce
         );
     }
 }

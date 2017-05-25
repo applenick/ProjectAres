@@ -79,7 +79,7 @@ public class ObjectivesFireworkListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onHillCapture(final ControllerChangeEvent event) {
-        if(FireworksConfig.Goals.enabled() && event.getControlPoint().isVisible() && event.getNewController() != null) {
+        if(FireworksConfig.Goals.enabled() && (event.getControlPoint().isVisible() || event.getControlPoint().getShouldAnnounce()) && event.getNewController() != null) {
             this.spawnFireworkDisplay(event.getMatch().getWorld(),
                                       event.getControlPoint().getCaptureRegion(),
                                       BukkitUtils.colorOf(event.getNewController().getColor()),

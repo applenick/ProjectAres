@@ -233,6 +233,10 @@ public class ControlPoint extends SimpleGoal<ControlPointDefinition> implements 
         return this.definition.getPlayerFilter() == null ||
                this.definition.getPlayerFilter().query(player).isAllowed();
     }
+    
+    public boolean getShouldAnnounce() {
+    	return this.definition.getShouldAnnounce();
+    }
 
     private Duration calculateDominateTime(int lead, Duration duration) {
         // Don't scale time if only one player is present, don't zero duration if multiplier is zero

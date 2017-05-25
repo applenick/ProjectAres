@@ -61,6 +61,8 @@ public interface ControlPointDefinition extends GoalDefinition, GamemodeFeature 
     float getPointsGrowth();
 
     boolean getShowProgress();
+    
+    boolean getShouldAnnounce();
 
     // Conditions required for a team to capture:
     enum CaptureCondition {
@@ -128,6 +130,9 @@ class ControlPointDefinitionImpl extends GoalDefinitionImpl implements ControlPo
 
     // If true, capturing progress is displayed on the scoreboard
     private final boolean showProgress;
+    
+    // If true, this point will display fireworks & announce in chat (even if isVisible() is false)
+    private final boolean announce;
 
     public ControlPointDefinitionImpl(String name,
                                       @Nullable Boolean required,
@@ -150,7 +155,8 @@ class ControlPointDefinitionImpl extends GoalDefinitionImpl implements ControlPo
                                       float pointsOwned,
                                       float pointsPerSecond,
                                       float pointsGrowth,
-                                      boolean progress) {
+                                      boolean progress,
+                                      boolean announce) {
 
         super(name, required, visible);
         this.captureRegion = captureRegion;
@@ -172,6 +178,7 @@ class ControlPointDefinitionImpl extends GoalDefinitionImpl implements ControlPo
         this.pointsPerSecond = pointsPerSecond;
         this.pointsGrowth = pointsGrowth;
         this.showProgress = progress;
+        this.announce = announce;
     }
 
     @Override
@@ -189,7 +196,8 @@ class ControlPointDefinitionImpl extends GoalDefinitionImpl implements ControlPo
                " progressDisplay=" + this.getProgressDisplayRegion() +
                " ownerDisplay=" + this.getControllerDisplayRegion() +
                " beacon=" + this.getCapturableDisplayBeacon() +
-               " visible=" + this.isVisible();
+               " visible=" + this.isVisible() +
+               " announce=" + this.getShouldAnnounce();
     }
 
     @Override
@@ -312,5 +320,10 @@ class ControlPointDefinitionImpl extends GoalDefinitionImpl implements ControlPo
     @Override
     public boolean getShowProgress() {
         return this.showProgress;
+    }
+    
+    @Override
+    public boolean getShouldAnnounce() {
+    	return this.announce;
     }
 }

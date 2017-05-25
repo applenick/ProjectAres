@@ -21,7 +21,7 @@ public class ControlPointAnnouncer implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onOwnerChange(ControllerChangeEvent event) {
-        if(event.getControlPoint().isVisible()) {
+        if(event.getControlPoint().isVisible() || event.getControlPoint().getShouldAnnounce()) {
             final Component point = new Component(event.getControlPoint().getComponentName(), ChatColor.WHITE);
             final Component message = new Component(ChatColor.GRAY);
             final Competitor before = event.getOldController();
