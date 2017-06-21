@@ -64,15 +64,30 @@ public class MatchFlairRenderer extends FlairRenderer {
 	}
 	
 	//Thunderstorm PvP - We use our own backend to fetch a ranks & their proper flair
-	//Only bug atm is new flairs update after a map cycle or user restarts their session
+	//Only bug atm is newly set flair update after a map cycle or user restarts their session
 	private String getFlairName(Player player, String name){
 		ThunderUsers users = Lightning.get().getUsers();
 		ThunderUser user = users.getThunderUser(player.getUniqueId());
 		if(user != null){
-			if(user.hasFlair() && !user.isDisguised()){
-				return user.getFlair() + name;
+			String flair = "";
+			
+			//If the user is not using a nickname
+			if(!user.isDisguised()){
+
+				//If the user has a rank with a flair
+				if(user.hasRankFlair()){
+					flair = user.getRankFlair();
+				}
+				
+				//If the user has a custom flair
+				if(user.hasFlair()){
+					flair = flair + user.getFlair();
+				}
+
+				return flair + name;
 			}
 		}
+		
 		return name;
 	}
 }

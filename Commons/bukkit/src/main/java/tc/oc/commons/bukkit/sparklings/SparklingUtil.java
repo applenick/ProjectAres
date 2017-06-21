@@ -39,7 +39,7 @@ public class SparklingUtil {
         int multiplier = SparklingConstants.MULTIPLIER_BASE;
         if(player != null) {
             for(int i = SparklingConstants.MULTIPLIER_MAX; i > 0; i = i - SparklingConstants.MULTIPLIER_INCREMENT) {
-                if(player.hasPermission("raindrops.multiplier." + i)) {
+                if(player.hasPermission("sparklings.multiplier." + i)) {
                     multiplier = i;
                     break;
                 }
