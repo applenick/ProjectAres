@@ -1,51 +1,81 @@
 package tc.oc.pgm.gui;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.Nullable;
 
+import org.bukkit.ChatColor;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import tc.oc.commons.core.formatting.StringUtils;
 import tc.oc.pgm.PGMTranslations;
 import tc.oc.pgm.match.MatchPlayer;
 
-public abstract class InventoryGui {
+public abstract class PageGui {
 
-
-	/*
-	 * Code extracted from PickerMatchModule to allow for more general reuse on other modules
-	 */
 
 	public Set<MatchPlayer> viewing = Sets.newHashSet();
+	public HashMap<MatchPlayer,Integer> viewerPages = Maps.newHashMap();
 
 	public String title;
 	private int size;
 
 	public static final int WIDTH = 9; // Inventory width in slots - for readability
 
-	public InventoryGui(String title, int size){
+	public PageGui(String title, int size){
 		this.title = title;
 		this.size = size;
 	}
 
+	public int getPage(MatchPlayer player){
+		return (viewerPages.get(player) != null ? viewerPages.get(player) : 1);
+	}
+
+	public void setPage(MatchPlayer player, int page){
+		this.viewerPages.put(player, page);
+	}
+	
+	//The title of the inventory with added page #
 	public String getTranslatedTitle(MatchPlayer player){
-		return PGMTranslations.t(title, player);
+		return ChatColor.GREEN + ChatColor.BOLD.toString() + PGMTranslations.t(title, player) + ChatColor.GOLD + " \u00BB " + ChatColor.DARK_AQUA + "Page " + ChatColor.AQUA + getPage(player);
 	}
 
 	public void display(MatchPlayer player){
-		this.showWindow(player);
+		this.showWindow(player, getPage(player));
+		addViewer(player);
+	}
+
+	public void close(MatchPlayer player){
+		scheduleClose(player);
+		removeViewer(player);
+	}
+
+	private void scheduleClose(final MatchPlayer player) {
+		player.nextTick(() -> {
+			player.getBukkit().getOpenInventory().getTopInventory().clear();
+			player.getBukkit().closeInventory();
+		});
+	}
+	
+	
+	public boolean isViewing(MatchPlayer player){
+		return this.viewing.contains(player);
+	}
+	
+	public void removeViewer(MatchPlayer player){
+		this.viewing.remove(player);
+	}
+	
+	public void addViewer(MatchPlayer player){
 		this.viewing.add(player);
 	}
 
-	public void refreshAll(){
-		viewing.forEach(viewer -> {
-			refreshWindow(viewer);
-		});
-	}
 
 	/**
 	 * Open the window for the given player, or refresh its contents
@@ -57,8 +87,8 @@ public abstract class InventoryGui {
 	 * If the player is not currently allowed to have the window open,
 	 * close any window they have open and return null.
 	 */
-	private @Nullable Inventory showWindow(MatchPlayer player) {    	
-		ItemStack[] contents = createWindowContents(player);
+	private @Nullable Inventory showWindow(MatchPlayer player, int page) {    	
+		ItemStack[] contents = createWindowContents(player, page);
 		Inventory inv = getOpenWindow(player);
 		if(inv != null && inv.getSize() < contents.length) {
 			inv = null;
@@ -75,22 +105,18 @@ public abstract class InventoryGui {
 	/**
 	 * If the given player currently has the window open, refresh its contents
 	 * and return the updated inventory. The window will be closed and reopened
-	 * if it is too small to hold the current contents.
+	 * every time as to update the inventory title.
 	 *
 	 * If the window is open but should be closed, close it and return null.
 	 *
 	 * If the player does not have the window open, return null.
 	 */
-	private @Nullable Inventory refreshWindow(MatchPlayer player) {
+	protected @Nullable Inventory refreshWindow(MatchPlayer player, int page) {
 		Inventory inv = getOpenWindow(player);
 		if(inv != null) {
-			ItemStack[] contents = createWindowContents(player);
-			if(inv.getSize() < contents.length) {
-				closeWindow(player);
-				inv = openWindow(player, contents);
-			} else {
-				inv.setContents(contents);
-			}
+			ItemStack[] contents = createWindowContents(player, page);
+			closeWindow(player);
+			inv = openWindow(player, contents);
 		}
 		return inv;
 	}
@@ -134,5 +160,6 @@ public abstract class InventoryGui {
 	/**
 	 * Defines how the GUI will display the layout
 	 */
-	public abstract ItemStack[] createWindowContents(final MatchPlayer player);
+	public abstract ItemStack[] createWindowContents(final MatchPlayer player, int page);
+
 }

@@ -1,9 +1,11 @@
 package tc.oc.pgm;
 
-import java.util.List;
+import static com.google.common.base.Preconditions.checkState;
+
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -11,9 +13,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import com.applenick.Lightning.Lightning;
-import com.google.common.collect.Lists;
 
 import tc.oc.api.util.Permissions;
 import tc.oc.commons.bukkit.inject.BukkitPluginManifest;
@@ -26,7 +25,6 @@ import tc.oc.minecraft.logging.BetterRaven;
 import tc.oc.pgm.antigrief.CraftingProtect;
 import tc.oc.pgm.channels.ChannelCommands;
 import tc.oc.pgm.commands.MapCommands;
-import tc.oc.pgm.commands.PollCommands;
 import tc.oc.pgm.commands.RotationControlCommands;
 import tc.oc.pgm.commands.RotationEditCommands;
 import tc.oc.pgm.events.ConfigLoadEvent;
@@ -38,18 +36,16 @@ import tc.oc.pgm.listeners.ItemTransferListener;
 import tc.oc.pgm.logging.MapTagger;
 import tc.oc.pgm.map.MapLibrary;
 import tc.oc.pgm.map.MapNotFoundException;
+import tc.oc.pgm.mapgui.MapMenu;
+import tc.oc.pgm.mapgui.MapMenuListener;
 import tc.oc.pgm.mapratings.MapRatingsCommands;
 import tc.oc.pgm.match.Match;
 import tc.oc.pgm.match.MatchLoader;
 import tc.oc.pgm.match.MatchManager;
 import tc.oc.pgm.match.MatchPlayer;
-import tc.oc.pgm.polls.PollListener;
-import tc.oc.pgm.polls.PollManager;
 import tc.oc.pgm.start.StartCommands;
 import tc.oc.pgm.tablist.MatchTabManager;
 import tc.oc.pgm.timelimit.TimeLimitCommands;
-
-import static com.google.common.base.Preconditions.checkState;
 
 public final class PGM extends JavaPlugin {
 
@@ -72,7 +68,9 @@ public final class PGM extends JavaPlugin {
     @Inject private MapdevLogger mapdevLogger;
     @Inject private NavigatorInterface navigatorInterface;
     @Inject private Provider<MatchLoader> matchLoader;
-
+    
+    private MapMenu mapMenu;
+    
     private MatchManager matchManager;
 
     public static MatchManager getMatchManager() {
@@ -94,7 +92,11 @@ public final class PGM extends JavaPlugin {
     public MapLibrary getMapLibrary() {
         return mapLibrary;
     }
-
+    
+    public MapMenu getMapMenu(){
+    	return mapMenu;
+    }
+    
     private MatchTabManager matchTabManager;
 
     private void setupSentry() {
@@ -105,6 +107,7 @@ public final class PGM extends JavaPlugin {
     @Override
     public void onEnable() {
         matchManager = injector().getInstance(MatchManager.class);
+        mapMenu      = injector().getInstance(MapMenu.class);
 
         getServer().getConsoleSender().addAttachment(this, Permissions.MAPDEV, true);
         getServer().getConsoleSender().addAttachment(this, Permissions.MAPERRORS, true);
@@ -195,6 +198,7 @@ public final class PGM extends JavaPlugin {
         this.registerEvents(new CraftingProtect());
         this.registerEvents(new ObjectivesFireworkListener());
         this.registerEvents(new ItemTransferListener());
+        this.registerEvents(new MapMenuListener());
     }
 
     public void registerEvents(Listener listener) {
