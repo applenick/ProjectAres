@@ -38,6 +38,8 @@ public interface DestroyableFactory extends ProximityGoalDefinition, GamemodeFea
     boolean hasSparks();
 
     boolean isRepairable();
+    
+    boolean showDenyMessage();
 }
 
 class DestroyableFactoryImpl extends ProximityGoalDefinitionImpl implements DestroyableFactory {
@@ -48,6 +50,7 @@ class DestroyableFactoryImpl extends ProximityGoalDefinitionImpl implements Dest
     private final @Inspect boolean showProgress;
     private final @Inspect boolean sparks;
     private final @Inspect boolean repairable;
+    private final @Inspect boolean denyMessage;
 
     public DestroyableFactoryImpl(String name,
                                   @Nullable Boolean required,
@@ -60,7 +63,8 @@ class DestroyableFactoryImpl extends ProximityGoalDefinitionImpl implements Dest
                                   boolean modeChanges,
                                   boolean showProgress,
                                   boolean sparks,
-                                  boolean repairable) {
+                                  boolean repairable,
+                                  boolean denyMessage) {
         super(name, required, visible, Optional.of(owner), proximityMetric);
         this.region = region;
         this.materials = materials;
@@ -69,6 +73,7 @@ class DestroyableFactoryImpl extends ProximityGoalDefinitionImpl implements Dest
         this.showProgress = showProgress;
         this.sparks = sparks;
         this.repairable = repairable;
+        this.denyMessage = denyMessage;
     }
 
     @Override
@@ -124,5 +129,10 @@ class DestroyableFactoryImpl extends ProximityGoalDefinitionImpl implements Dest
     @Override
     public boolean isRepairable() {
         return this.repairable;
+    }
+    
+    @Override
+    public boolean showDenyMessage() {
+    	return this.denyMessage;
     }
 }

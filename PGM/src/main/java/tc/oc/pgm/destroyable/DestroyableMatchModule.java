@@ -114,7 +114,10 @@ public class DestroyableMatchModule extends MatchModule implements Listener {
                destroyable.hasMaterial(material)) {
 
                 event.setCancelled(true);
-                player.sendWarning(new TranslatableComponent("match.destroyable.damageOwn"), true);
+                
+                if(destroyable.getDefinition().showDenyMessage()){
+                    player.sendWarning(new TranslatableComponent("match.destroyable.damageOwn"), true);
+                }
             }
         }
     }

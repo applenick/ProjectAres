@@ -46,7 +46,8 @@ public class DestroyableParser implements FeatureDefinitionParser<DestroyableFac
             booleanParser.property(el, "mode-changes").optional(false),
             booleanParser.property(el, "show-progress").optional(false),
             booleanParser.property(el, "sparks").optional(false),
-            booleanParser.property(el, "repairable").optional(false)
+            booleanParser.property(el, "repairable").optional(false),
+            booleanParser.property(el, "deny-message").optional(true)
         );
     }
 }
