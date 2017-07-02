@@ -1,25 +1,32 @@
 package tc.oc.pgm.listing;
 
 import java.security.SecureRandom;
+
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import com.google.common.util.concurrent.ListenableFuture;
-import net.md_5.bungee.api.chat.TranslatableComponent;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.scheduler.BukkitScheduler;
+
+import com.applenick.Lightning.Lightning;
+import com.google.common.util.concurrent.ListenableFuture;
+
+import net.md_5.bungee.api.chat.TranslatableComponent;
 import tc.oc.api.http.HttpClient;
 import tc.oc.api.http.HttpOption;
 import tc.oc.api.message.types.Reply;
 import tc.oc.commons.bukkit.chat.Audiences;
 import tc.oc.commons.core.commands.CommandFutureCallback;
 import tc.oc.commons.core.concurrent.Flexecutor;
+import tc.oc.commons.core.scheduler.Scheduler;
 import tc.oc.minecraft.api.event.Enableable;
 import tc.oc.minecraft.api.server.LocalServer;
 import tc.oc.minecraft.scheduler.Sync;
+import tc.oc.pgm.PGM;
 
 @Singleton
 class ListingServiceImpl implements ListingService, Enableable {
@@ -31,23 +38,22 @@ class ListingServiceImpl implements ListingService, Enableable {
     private final Flexecutor executor;
     private final Audiences audiences;
     private final ConsoleCommandSender console;
-
+    private final Scheduler scheduler;
+    
+    private boolean generated;
+    
     private boolean online;
     private @Nullable String sessionId;
     private @Nullable String sessionDigest;
 
-    @Inject ListingServiceImpl(HttpClient http, ListingConfiguration config, LocalServer localServer, @Sync(defer = true) Flexecutor executor, Audiences audiences, ConsoleCommandSender console) {
+    @Inject ListingServiceImpl(HttpClient http, ListingConfiguration config, LocalServer localServer, @Sync(defer = true) Flexecutor executor, Audiences audiences, ConsoleCommandSender console, Scheduler scheduler) {
         this.http = http;
         this.config = config;
         this.localServer = localServer;
         this.executor = executor;
         this.audiences = audiences;
-        this.console = console;
-    }
-
-    @Override
-    public @Nullable String sessionDigest() {
-        return sessionDigest;
+        this.console = console;    
+        this.scheduler = scheduler;
     }
 
     @Override
@@ -56,6 +62,9 @@ class ListingServiceImpl implements ListingService, Enableable {
             // Don't announce until we are ready to receive the ping
             executor.execute(() -> update(true));
         }
+        
+        //Generate the sessionID after the server starts every time
+        scheduler.createTask(() -> generateSession());
     }
 
     @Override
@@ -64,6 +73,23 @@ class ListingServiceImpl implements ListingService, Enableable {
             update(false);
         }
     }
+    
+    @Override
+    public @Nullable String sessionDigest() {
+        return sessionDigest;
+    }
+    
+    public void generateSession(){
+    	final byte[] bytes = new byte[20];
+        random.nextBytes(bytes);
+        sessionId = Hex.encodeHexString(bytes);
+        sessionDigest = DigestUtils.sha1Hex(sessionId);
+        
+        this.generated = true;
+        
+        Lightning.get().getBungeeListing().updateSession(sessionDigest);
+    }
+
 
     @Override
     public ListenableFuture<Reply> update(boolean online) {
@@ -73,14 +99,11 @@ class ListingServiceImpl implements ListingService, Enableable {
     @Override
     public ListenableFuture<Reply> update(boolean online, CommandSender sender) {
         this.online = online;
-
-        if(sessionId == null) {
-            final byte[] bytes = new byte[20];
-            random.nextBytes(bytes);
-            sessionId = Hex.encodeHexString(bytes);
-            sessionDigest = DigestUtils.sha1Hex(sessionId);
+                
+        if(!generated){
+            this.generateSession();
         }
-
+        
         final ListenableFuture<Reply> future = http.post(config.announceUrl().toString(), new ListingUpdate() {
             @Override public @Nullable String host() {
                 return config.serverHost();
@@ -107,12 +130,14 @@ class ListingServiceImpl implements ListingService, Enableable {
             CommandFutureCallback.onSuccess(sender, reply -> {
                 if(!online) {
                     sessionId = sessionDigest = null;
+                    this.generated = false;
                 }
+                
 
                 audiences.get(sender).sendMessage(new TranslatableComponent(online ? "announce.online" : "announce.offline"));
             })
         );
 
         return future;
-    }
+    }    
 }
