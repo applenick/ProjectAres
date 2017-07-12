@@ -7,12 +7,14 @@ public class RushConfig {
     public final int timeLimit;
     public final boolean regenerate;
 
+    public final Region spawnLine;
     public final Region startLine;
     public final Region finishLine;
 
-    public RushConfig(int timeLimit, boolean regenerate, Region startLine, Region finishLine) {
+    public RushConfig(int timeLimit, boolean regenerate, Region spawnLine, Region startLine, Region finishLine) {
         this.timeLimit = timeLimit;
         this.regenerate = regenerate;
+        this.spawnLine  =spawnLine;
         this.startLine = startLine;
         this.finishLine = finishLine;
     }
@@ -25,6 +27,10 @@ public class RushConfig {
         return regenerate;
     }
 
+    public Region getSpawnLine() {
+        return spawnLine;
+    }
+    
     public Region getStartLine() {
         return startLine;
     }

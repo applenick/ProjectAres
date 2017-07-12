@@ -54,9 +54,10 @@ public class RushModule implements MapModule, MatchModuleFactory<RushMatchModule
         boolean regenerate = XMLUtils.parseBoolean(rushElement, "regenerate").optional(false);
         
         final RegionParser regionParser = context.needModule(RegionParser.class);
+        Region spawnLine = regionParser.property(rushElement, "spawn-line").alias("spawn").union();
         Region startLine = regionParser.property(rushElement, "start-line").alias("start").union();
         Region finishLine = regionParser.property(rushElement, "finish-line").alias("finish").union();
 
-        return new RushModule(new RushConfig(timeLimit, regenerate, startLine, finishLine));
+        return new RushModule(new RushConfig(timeLimit, regenerate, spawnLine, startLine, finishLine));
     }
 }

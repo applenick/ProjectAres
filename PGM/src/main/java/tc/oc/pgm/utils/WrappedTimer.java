@@ -23,12 +23,24 @@ public class WrappedTimer {
     public Stopwatch start() {
         return timer.start();
     }
-    
+
+    /**
+     * Starts the stopwatch if the flag is true and has not been started
+     * already.
+     * 
+     * @param flag
+     *            the flag
+     * @return the flag
+     */
     public boolean start(boolean flag) {
-        if(flag) {
+        if (timer.isRunning()) {
+            return flag;
+        }
+
+        if (flag) {
             start();
         }
-        
+
         return flag;
     }
 
