@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map proto="1.4.0">
+   <name>Rush Test</name>
+   <slug>rushtest</slug>
+   <version>1.0.0</version>
+   <gamemode>rush</gamemode>
+   <objective>Make your way to the end as fast as possible!</objective>
+   <authors>
+      <author uuid="378cd344-a16a-404b-b672-a8ca7e54ec86" />
+      <!--NotWoobie -->
+   </authors>
+   <score />
+   <players min="2" max="20" show-name-tags="true" />
+   <respawn auto="false" />
+   <spawns safe="true">
+      <spawn>
+         <regions yaw="-90" pitch="0">
+            <point>674.5,107,795.5</point>
+         </regions>
+      </spawn>
+      <default>
+         <regions yaw="-90" pitch="0">
+            <point>668.5,109,795.5</point>
+         </regions>
+      </default>
+   </spawns>
+   <rush regenerate="false">
+      <time-limit>20</time-limit>
+      <spawn-line>
+         <block>674.5,107,795.5</block>
+      </spawn-line>
+      <start-line>
+         <block>678.5,107,795.5</block>
+      </start-line>
+      <finish-line>
+         <block>710.5,107,795.5</block>
+      </finish-line>
+   </rush>
+   <gamerules>
+      <doDaylightCycle>false</doDaylightCycle>
+   </gamerules>
+   <hunger>
+      <depletion>off</depletion>
+   </hunger>
+</map>
