@@ -16,7 +16,6 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.util.Vector;
 
 import net.md_5.bungee.api.chat.TextComponent;
-import net.minecraft.server.Scoreboard;
 import tc.oc.commons.bukkit.event.CoarsePlayerMoveEvent;
 import tc.oc.commons.core.scheduler.Task;
 import tc.oc.pgm.events.ListenerScope;
@@ -26,7 +25,6 @@ import tc.oc.pgm.match.MatchPlayer;
 import tc.oc.pgm.match.MatchScope;
 import tc.oc.pgm.regions.Region;
 import tc.oc.pgm.score.ScoreMatchModule;
-import tc.oc.pgm.scoreboard.ScoreboardMatchModule;
 import tc.oc.pgm.utils.MatchPlayers;
 import tc.oc.pgm.utils.WrappedTimer;
 
@@ -83,7 +81,7 @@ public class RushMatchModule extends MatchModule implements Listener {
             return;
         } else if (checkState(PLAYER_RUNNING)) {
             if (config.getFinishLine().contains(to.toBlockVector())) {
-                incrementAndReset(player, timer.reset(TimeUnit.MILLISECONDS));
+                incrementAndReset(player, TimeUnit.SECONDS.toMillis(config.getTimeLimit()) - timer.reset(TimeUnit.MILLISECONDS));
             } else {
                 return;
             }
