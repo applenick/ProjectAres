@@ -14,6 +14,7 @@ import tc.oc.pgm.map.MapModuleContext;
 import tc.oc.pgm.match.Match;
 import tc.oc.pgm.match.MatchModuleFactory;
 import tc.oc.pgm.module.ModuleDescription;
+import tc.oc.pgm.regions.Region;
 
 @ModuleDescription(name = "Rage", follows = { BlitzModule.class })
 public class RageModule implements MapModule, MatchModuleFactory<RageMatchModule> {
@@ -45,7 +46,6 @@ public class RageModule implements MapModule, MatchModuleFactory<RageMatchModule
     // ---------------------
 
     public static RageModule parse(MapModuleContext context, Logger logger, Document doc) {
-
         if(doc.getRootElement().getChild("rage") != null) {
             return new RageModule(context.module(BlitzModule.class).filter(BlitzModule::active).isPresent());
         } else {

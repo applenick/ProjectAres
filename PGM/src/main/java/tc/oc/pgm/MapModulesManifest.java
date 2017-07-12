@@ -33,6 +33,7 @@ import tc.oc.pgm.projectile.ProjectileModule;
 import tc.oc.pgm.proximity.ProximityAlarmModule;
 import tc.oc.pgm.rage.RageModule;
 import tc.oc.pgm.renewable.RenewableModule;
+import tc.oc.pgm.rush.RushModule;
 import tc.oc.pgm.score.ScoreModule;
 import tc.oc.pgm.spawns.SpawnModule;
 import tc.oc.pgm.stamina.StaminaModule;
@@ -72,6 +73,7 @@ public class MapModulesManifest extends HybridManifest {
         install(new StaticMethodMapModuleFactory<KillRewardModule>(){});
         install(new StaticMethodMapModuleFactory<GhostSquadronModule>(){});
         install(new StaticMethodMapModuleFactory<RageModule>(){});
+        install(new StaticMethodMapModuleFactory<RushModule>(){});
         install(new StaticMethodMapModuleFactory<FriendlyFireRefundModule>(){});
         install(new StaticMethodMapModuleFactory<BlockDropsModule>(){});
         install(new StaticMethodMapModuleFactory<RenewableModule>(){});
