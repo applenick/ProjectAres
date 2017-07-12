@@ -13,7 +13,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.util.Vector;
 
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -58,6 +57,7 @@ public class RushMatchModule extends MatchModule implements Listener, JoinHandle
     private Task countdownTask;
     private Task timelimitTask;
     private int countdown;
+    private int timeLeft;
     
     private BossBarSource spectatorBossBar;
 
@@ -68,6 +68,7 @@ public class RushMatchModule extends MatchModule implements Listener, JoinHandle
         this.bossBarModule = match.needMatchModule(BossBarMatchModule.class);
         this.rushState = COUNTDOWN;
         this.countdown = COUNTDOWN_SECONDS;
+        this.timeLeft = config.getTimeLimit();
         match.registerEvents(this);
     }
     
@@ -85,7 +86,7 @@ public class RushMatchModule extends MatchModule implements Listener, JoinHandle
 
         return null;
     }
-    
+
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onMatchStateChange(final MatchStateChangeEvent event) {
         if(event.getNewState() == MatchState.Running) {
@@ -102,7 +103,7 @@ public class RushMatchModule extends MatchModule implements Listener, JoinHandle
     private void handlePlayerMove(Player bukkit, Vector to, CoarsePlayerMoveEvent event) {
         MatchPlayer player = this.match.getPlayer(bukkit);
         Competitor competitor = player.getCompetitor();
-        System.out.println(state());
+
         if (player != currentPlayer || !MatchPlayers.canInteract(player)
             || player.getBukkit().isDead()) {
             return;
@@ -123,18 +124,16 @@ public class RushMatchModule extends MatchModule implements Listener, JoinHandle
             
             return;
         } else if (checkState(PLAYER_RUNNING)) {
-            long score = TimeUnit.SECONDS.toMillis(config.getTimeLimit()) - timer.elapsed(TimeUnit.MILLISECONDS) / 10000;
-            scoreModule.incrementScore(competitor, score - scoreModule.getScore(competitor));
-
             if (config.getFinishLine().contains(to.toBlockVector())) {
-                reset(player, 0);
+                reset(player, scoreModule.getScore(competitor));
+                timer.reset();
             }
             
             return;
         }
 
         if(currentPlayer == null) {
-            match.end();
+            end();
             return;
         }
 
@@ -144,6 +143,7 @@ public class RushMatchModule extends MatchModule implements Listener, JoinHandle
     private void updateCountdown() {
         if (--countdown <= 0) {
             countdown = COUNTDOWN_SECONDS;
+            timeLeft = config.getTimeLimit();
             rushState = WAITING_FOR_PLAYER;
             countdownTask.cancel();
             currentPlayer.showTitle(new TextComponent("GO!"), null, 5, 10, 5);
@@ -152,9 +152,9 @@ public class RushMatchModule extends MatchModule implements Listener, JoinHandle
         }
     }
     
-    private void reset(MatchPlayer player, long score) {
+    private void reset(MatchPlayer player, double score) {
         timelimitTask.cancel();
-        scoreModule.incrementScore(player.getCompetitor(), score);
+        scoreModule.setScore(player.getCompetitor(), score);
         resetPlayer();
     }
 
@@ -166,7 +166,7 @@ public class RushMatchModule extends MatchModule implements Listener, JoinHandle
 
     private void prepare(MatchPlayer player, Region region, boolean force) {
         if(currentPlayer == null) {
-            match.end();
+            end();
             return;
         }
         
@@ -178,12 +178,16 @@ public class RushMatchModule extends MatchModule implements Listener, JoinHandle
 
         rushState = COUNTDOWN;
         countdownTask = match.getScheduler(MatchScope.RUNNING).createRepeatingTask(Duration.ofSeconds(1), () -> updateCountdown());
-        timelimitTask = match.getScheduler(MatchScope.RUNNING).createDelayedTask(Duration.ofSeconds(config.getTimeLimit()), () -> reset(player, 1));
+        timelimitTask = match.getScheduler(MatchScope.RUNNING).createRepeatingTask(Duration.ofSeconds(1), () -> {
+            if(--timeLeft <= 0) {
+                reset(player, 1);
+            } else {
+                long score = (TimeUnit.SECONDS.toMillis(config.getTimeLimit()) - timer.elapsed(TimeUnit.MILLISECONDS));
+                scoreModule.setScore(player.getCompetitor(), score);
+            }
+        });
         
-        if(spectatorBossBar != null) {
-            bossBarModule.invalidate(spectatorBossBar);
-        }
-        
+        removeBossBar();
         spectatorBossBar = new BossBarSource() {
             @Override
             public BaseComponent barText(Player viewer) {
@@ -192,7 +196,7 @@ public class RushMatchModule extends MatchModule implements Listener, JoinHandle
             
             @Override
             public float barProgress(Player viewer) {
-                return 1f - ((timer.elapsed(TimeUnit.MILLISECONDS) * 100 / config.getTimeLimit() * 1000) / 100);
+                return Math.max(0f, Math.min(1f, 1f - ((timer.elapsed(TimeUnit.MILLISECONDS) * 100 / config.getTimeLimit() * 1000) / 100)));
             }
         };
         bossBarModule.add(spectatorBossBar, match.players().filter(other -> other != player).map(MatchPlayer::getBukkit));
@@ -200,6 +204,18 @@ public class RushMatchModule extends MatchModule implements Listener, JoinHandle
             other.setVisible(false);
             other.getBukkit().setGameMode(GameMode.SPECTATOR);
         });
+    }
+    
+    private void end() {
+        removeBossBar();
+        match.end();
+    }
+    
+    private void removeBossBar() {
+        if(spectatorBossBar != null) {
+            bossBarModule.invalidate(spectatorBossBar);
+            bossBarModule.remove(spectatorBossBar);
+        }
     }
 
     private Optional<MatchPlayer> newPlayer() {

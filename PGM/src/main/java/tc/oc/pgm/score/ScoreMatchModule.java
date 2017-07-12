@@ -99,4 +99,16 @@ public class ScoreMatchModule extends MatchModule implements Listener {
         this.scores.put(competitor, event.getNewScore());
         this.match.needMatchModule(VictoryMatchModule.class).invalidateAndCheckEnd();
     }
+    
+    public void setScore(Competitor competitor, double amount) {
+        if(this.config.scoreLimit.isPresent() && amount > this.config.scoreLimit.get()) {
+            amount = this.config.scoreLimit.get();
+        }
+        
+        MatchScoreChangeEvent event = new MatchScoreChangeEvent(competitor.getMatch(), competitor, this.scores.get(competitor), amount);
+        this.match.getServer().getPluginManager().callEvent(event);
+
+        this.scores.put(competitor, event.getNewScore());
+        this.match.needMatchModule(VictoryMatchModule.class).invalidateAndCheckEnd();
+    }
 }
