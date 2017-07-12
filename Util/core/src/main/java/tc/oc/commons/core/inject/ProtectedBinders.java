@@ -1,5 +1,7 @@
 package tc.oc.commons.core.inject;
 
+import com.google.inject.Binder;
+
 import tc.oc.inject.ForwardingBinder;
 import tc.oc.inject.ForwardingPrivateBinder;
 import tc.oc.inject.ForwardingProtectedBinder;
@@ -17,7 +19,12 @@ public interface ProtectedBinders extends PrivateBinders, ForwardingProtectedBin
                                                            ForwardingBinder.class,
                                                            ForwardingPrivateBinder.class,
                                                            ForwardingProtectedBinder.class);
-        return () -> skipped;
+        return new ProtectedBinders() {
+			@Override
+			public ProtectedBinder forwardedBinder() {
+				return skipped;
+			}
+		};
     }
 
     @Override

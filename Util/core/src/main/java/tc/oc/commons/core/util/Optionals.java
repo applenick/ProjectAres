@@ -160,7 +160,7 @@ public final class Optionals {
     }
 
     public static <T, U, R> Optional<R> mapBoth(Optional<T> t, Optional<U> u, BiFunction<T, U, R> mapper) {
-        return flatMapBoth(t, u, mapper.andThen(Optional::of));
+        return (Optional<R>) flatMapBoth(t, u, mapper.andThen(Optional::of));
     }
 
     public static <T, U, R> Optional<R> flatMapBoth(Optional<T> t, Optional<U> u, BiFunction<T, U, Optional<R>> mapper) {

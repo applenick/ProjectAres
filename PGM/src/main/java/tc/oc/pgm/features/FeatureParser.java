@@ -330,7 +330,7 @@ public class FeatureParser<T extends FeatureDefinition> extends PrimitiveParser<
     }
 
     public <S extends PropertyBuilder<S>> PropertyBuilder<S> property(Element element, String name) {
-        return new PropertyBuilder<>(element, name);
+        return new PropertyBuilder<S>(element, name);
     }
 
     public class PropertyBuilder<Self extends PropertyBuilder<Self>> {

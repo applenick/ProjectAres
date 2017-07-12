@@ -5,6 +5,7 @@ import com.google.inject.Module;
 import com.google.inject.PrivateBinder;
 import com.google.inject.TypeLiteral;
 import com.google.inject.binder.LinkedBindingBuilder;
+
 import tc.oc.inject.ForwardingBinder;
 import tc.oc.inject.ForwardingPrivateBinder;
 
@@ -18,7 +19,12 @@ public interface PrivateBinders extends Binders, ForwardingPrivateBinder {
                                                          PrivateBinders.class,
                                                          ForwardingBinder.class,
                                                          ForwardingPrivateBinder.class);
-        return () -> skipped;
+		return new PrivateBinders() {
+			@Override
+			public PrivateBinder forwardedBinder() {
+				return skipped;
+			}
+		};
     }
 
     default <T> LinkedBindingBuilder<T> bindAndExpose(Key<T> key) {

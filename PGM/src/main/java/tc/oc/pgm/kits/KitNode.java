@@ -23,7 +23,7 @@ import static java.util.Optional.empty;
 public interface KitNode extends Kit {
 
     static KitNode of(Stream<Kit> kits) {
-        return new KitNodeImpl(Stream.empty(), new All<>(kits.map(Unit::new)), StaticFilter.ALLOW, empty(), empty());
+        return new KitNodeImpl(Stream.empty(), new All<Kit>(kits.map(Unit::new)), StaticFilter.ALLOW, empty(), empty());
     }
 
     static KitNode of(Kit... kits) {
