@@ -142,10 +142,7 @@ public class RushMatchModule extends MatchModule implements Listener, JoinHandle
 
     private void updateCountdown() {
         if (--countdown <= 0) {
-            countdown = COUNTDOWN_SECONDS;
-            timeLeft = config.getTimeLimit();
-            rushState = WAITING_FOR_PLAYER;
-            countdownTask.cancel();
+            resetTimes();
             currentPlayer.showTitle(new TextComponent("GO!"), null, 5, 10, 5);
         } else {
             currentPlayer.showTitle(new TextComponent(Integer.toString(countdown)), null, 5, 10, 5);
@@ -153,9 +150,21 @@ public class RushMatchModule extends MatchModule implements Listener, JoinHandle
     }
     
     private void reset(MatchPlayer player, double score) {
+        timer.reset();
         timelimitTask.cancel();
+        timeLeft = config.getTimeLimit();
         scoreModule.setScore(player.getCompetitor(), score);
         resetPlayer();
+    }
+    
+    private void resetTimes() {
+        countdown = COUNTDOWN_SECONDS;
+        timeLeft = config.getTimeLimit();
+        rushState = WAITING_FOR_PLAYER;
+
+        if (countdownTask != null) {
+            countdownTask.cancel();
+        }
     }
 
     private void resetPlayer() {
@@ -165,7 +174,7 @@ public class RushMatchModule extends MatchModule implements Listener, JoinHandle
     }
 
     private void prepare(MatchPlayer player, Region region, boolean force) {
-        if(currentPlayer == null) {
+        if(player == null) {
             end();
             return;
         }
@@ -196,7 +205,7 @@ public class RushMatchModule extends MatchModule implements Listener, JoinHandle
             
             @Override
             public float barProgress(Player viewer) {
-                return Math.max(0f, Math.min(1f, 1f - ((timer.elapsed(TimeUnit.MILLISECONDS) * 100 / config.getTimeLimit() * 1000) / 100)));
+                return Math.max(0f, Math.min(1f, 1f - ((timer.elapsed(TimeUnit.MILLISECONDS) * 100 / (config.getTimeLimit() * 1000)) / 100)));
             }
         };
         bossBarModule.add(spectatorBossBar, match.players().filter(other -> other != player).map(MatchPlayer::getBukkit));
@@ -207,6 +216,7 @@ public class RushMatchModule extends MatchModule implements Listener, JoinHandle
     }
     
     private void end() {
+        resetTimes();
         removeBossBar();
         match.end();
     }
