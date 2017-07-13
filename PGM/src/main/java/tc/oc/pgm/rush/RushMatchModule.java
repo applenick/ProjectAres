@@ -100,7 +100,7 @@ public class RushMatchModule extends MatchModule implements Listener {
     public void onPlayerDespawn(final ParticipantDespawnEvent event) {
         if (hasCurrentParticipator() && Objects.equal(event.getPlayer(), getCurrentParticipator().getPlayer())) {
             // TODO: Reset player back to default observer state
-            event.getPlayer().getBukkit().setGameMode(GameMode.SURVIVAL);
+            event.getPlayer().getBukkit().setGameMode(GameMode.CREATIVE);
 
             transitionToBlank();
         }
