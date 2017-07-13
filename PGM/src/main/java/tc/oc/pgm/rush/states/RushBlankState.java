@@ -22,6 +22,8 @@ public class RushBlankState extends RushTransitionState {
 
     @Override
     protected void transition() {
-
+        if (rushMatchModule.getConfig().isRegenerate()) {
+            rushMatchModule.getBlockTracker().renewAll();
+        }
     }
 }

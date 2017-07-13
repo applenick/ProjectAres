@@ -5,14 +5,11 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
-import com.google.common.base.Objects;
 import com.google.common.base.Stopwatch;
 
-import tc.oc.commons.bukkit.event.CoarsePlayerMoveEvent;
 import tc.oc.commons.core.scheduler.Task;
 import tc.oc.pgm.bossbar.BossBarMatchModule;
 import tc.oc.pgm.bossbar.BossBarSource;
@@ -29,9 +26,9 @@ import tc.oc.pgm.rush.states.RushFinishLineState;
 import tc.oc.pgm.rush.states.RushGameEndState;
 import tc.oc.pgm.rush.states.RushStartLineState;
 import tc.oc.pgm.rush.states.RushWaitState;
+import tc.oc.pgm.rush.tracker.RushBlockTracker;
+import tc.oc.pgm.rush.tracker.RushPlayerTracker;
 import tc.oc.pgm.score.ScoreMatchModule;
-import tc.oc.pgm.spawns.events.ParticipantDespawnEvent;
-import tc.oc.pgm.utils.MatchPlayers;
 import tc.oc.time.Time;
 
 @ListenerScope(MatchScope.RUNNING)
@@ -45,9 +42,13 @@ public class RushMatchModule extends MatchModule implements Listener {
     private final RushTransitionState[] transitionStates;
     private final Stopwatch timer;
 
+    private final RushPlayerTracker playerTracker;
+    private final RushBlockTracker blockTracker;
+
     private RushTransitionState currentState;
     private RushParticipator currentParticipator;
     private BossBarSource rushBossbar;
+
     private Task timelimitTask;
     private long timelimitStart;
 
@@ -63,8 +64,21 @@ public class RushMatchModule extends MatchModule implements Listener {
                                                             createState(RushStartLineState.class),
                                                             createState(RushWaitState.class) };
         this.timer = Stopwatch.createUnstarted();
+        this.playerTracker = new RushPlayerTracker(this);
+        this.blockTracker = new RushBlockTracker();
         this.currentState = transitionStates[0];
-        match.registerEvents(this);
+    }
+
+    @Override
+    public void load() {
+        super.load();
+        getMatch().registerEvents(playerTracker);
+    }
+
+    @Override
+    public void unload() {
+        HandlerList.unregisterAll(playerTracker);
+        super.unload();
     }
 
     @Repeatable(interval = @Time(milliseconds = 100), scope = MatchScope.RUNNING)
@@ -76,31 +90,6 @@ public class RushMatchModule extends MatchModule implements Listener {
 
         updateScore();
         updateState();
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerMove(final CoarsePlayerMoveEvent event) {
-        MatchPlayer player = this.match.getPlayer(event.getPlayer());
-
-        if (!hasCurrentParticipator() || !Objects.equal(player, getCurrentParticipator().getPlayer())
-            || !MatchPlayers.canInteract(player)
-            || player.getBukkit().isDead()) {
-            return;
-        }
-
-        if (getCurrentState() instanceof RushCountdownState) {
-            event.setTo(event.getFrom());
-        }
-
-        currentParticipator.setLastTo(event.getTo().toVector());
-        updateState();
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerDespawn(final ParticipantDespawnEvent event) {
-        if (hasCurrentParticipator() && Objects.equal(event.getPlayer(), getCurrentParticipator().getPlayer())) {
-            transitionToBlank();
-        }
     }
 
     public void setBossbar(BossBarSource bossBarSource, Stream<MatchPlayer> players) {
@@ -169,7 +158,7 @@ public class RushMatchModule extends MatchModule implements Listener {
         }
     }
 
-    private void updateState() {
+    public void updateState() {
         Stream.of(transitionStates)
               .filter(RushTransitionState::canTransition)
               .findFirst()
@@ -210,6 +199,10 @@ public class RushMatchModule extends MatchModule implements Listener {
         return timer;
     }
 
+    public RushBlockTracker getBlockTracker() {
+        return blockTracker;
+    }
+    
     public RushConfig getConfig() {
         return config;
     }

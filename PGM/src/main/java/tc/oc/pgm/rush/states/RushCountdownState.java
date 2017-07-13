@@ -46,7 +46,7 @@ public class RushCountdownState extends RushTransitionState {
         countdownTask = scheduler.createRepeatingTask(Duration.ofSeconds(1), this::tick);
 
         MatchPlayer participator = rushMatchModule.getCurrentPlayer();
-        participator.getBukkit().setGameMode(GameMode.ADVENTURE);
+        participator.getBukkit().setGameMode(GameMode.SURVIVAL);
         participator.getBukkit().teleport(rushMatchModule.getConfig().getSpawnLocation(rushMatchModule.getMatch()));
 
         rushMatchModule.getMatch()

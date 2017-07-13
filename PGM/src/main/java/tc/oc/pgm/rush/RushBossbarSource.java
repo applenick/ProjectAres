@@ -15,7 +15,7 @@ public class RushBossbarSource implements BossBarSource {
 
     private final RushMatchModule rushMatchModule;
 
-    public RushBossbarSource(tc.oc.pgm.rush.RushMatchModule rushMatchModule) {
+    public RushBossbarSource(RushMatchModule rushMatchModule) {
         this.rushMatchModule = rushMatchModule;
     }
 
