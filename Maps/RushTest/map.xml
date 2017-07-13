@@ -26,9 +26,9 @@
    </spawns>
    <rush regenerate="false">
       <time-limit>20</time-limit>
-      <spawn-line>
+      <spawn-point yaw="-90" pitch="0">
          <block>674.5,107,795.5</block>
-      </spawn-line>
+      </spawn-point>
       <start-line>
          <block>678.5,107,795.5</block>
       </start-line>
