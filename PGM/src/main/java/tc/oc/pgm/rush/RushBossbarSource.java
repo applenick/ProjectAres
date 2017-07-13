@@ -1,7 +1,5 @@
 package tc.oc.pgm.rush;
 
-import java.util.concurrent.TimeUnit;
-
 import org.bukkit.entity.Player;
 
 import com.google.api.client.util.Objects;
@@ -23,14 +21,14 @@ public class RushBossbarSource implements BossBarSource {
 
     @Override
     public BaseComponent barText(Player viewer) {
-        if(rushMatchModule.getCurrentParticipator() == null) {
+        if (rushMatchModule.getCurrentParticipator() == null) {
             return new TextComponent();
         }
-        
+
         if (Objects.equal(viewer, rushMatchModule.getCurrentParticipator().getPlayer().getBukkit())) {
-            long elapsed = rushMatchModule.getTimer().elapsed(TimeUnit.SECONDS);
+            long elapsed = System.currentTimeMillis() - rushMatchModule.getTimelimitStart();
             long timelimit = rushMatchModule.getConfig().getTimeLimit();
-            return new TextComponent(String.format(participatorMessage, timelimit - elapsed));
+            return new TextComponent(String.format(participatorMessage, timelimit - elapsed / 1000));
         }
 
         return new TextComponent(rushMatchModule.hasCurrentParticipator() ? String.format(spectatorMessage,
@@ -39,7 +37,7 @@ public class RushBossbarSource implements BossBarSource {
 
     @Override
     public float barProgress(Player viewer) {
-        long elapsed = rushMatchModule.getTimer().elapsed(TimeUnit.MILLISECONDS);
+        long elapsed = System.currentTimeMillis() - rushMatchModule.getTimelimitStart();
         long timelimit = rushMatchModule.getConfig().getTimeLimit() * 1000;
         float progress = 1f - Math.max(0f, Math.min(1f, elapsed * 100 / timelimit / 100f));
         return progress;

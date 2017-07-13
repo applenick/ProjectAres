@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -18,7 +17,6 @@ import tc.oc.commons.core.scheduler.Task;
 import tc.oc.pgm.bossbar.BossBarMatchModule;
 import tc.oc.pgm.bossbar.BossBarSource;
 import tc.oc.pgm.events.ListenerScope;
-import tc.oc.pgm.events.PlayerChangePartyEvent;
 import tc.oc.pgm.match.Match;
 import tc.oc.pgm.match.MatchModule;
 import tc.oc.pgm.match.MatchPlayer;
@@ -51,6 +49,7 @@ public class RushMatchModule extends MatchModule implements Listener {
     private RushParticipator currentParticipator;
     private BossBarSource rushBossbar;
     private Task timelimitTask;
+    private long timelimitStart;
 
     public RushMatchModule(Match match, RushConfig config) {
         super(match);
@@ -72,6 +71,7 @@ public class RushMatchModule extends MatchModule implements Listener {
     private void tick() {
         if (rushBossbar != null) {
             bossBarModule.render(rushBossbar);
+            bossBarModule.remove(rushBossbar, match.observers().map(MatchPlayer::getBukkit));
         }
 
         updateScore();
@@ -99,35 +99,8 @@ public class RushMatchModule extends MatchModule implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerDespawn(final ParticipantDespawnEvent event) {
         if (hasCurrentParticipator() && Objects.equal(event.getPlayer(), getCurrentParticipator().getPlayer())) {
-            // TODO: Reset player back to default observer state
-            event.getPlayer().getBukkit().setGameMode(GameMode.CREATIVE);
-
             transitionToBlank();
         }
-    }
-
-    private <T extends RushTransitionState> T createState(Class<T> state) {
-        try {
-            return state.getDeclaredConstructor(getClass()).newInstance(this);
-        } catch (Exception any) {
-            // TODO: Error handling
-            return null;
-        }
-    }
-
-    private void updateState() {
-        Stream.of(transitionStates)
-              .filter(RushTransitionState::canTransition)
-              .findFirst()
-              .map(RushTransitionState::getClass)
-              .ifPresent(this::transitionTo);
-    }
-
-    private Optional<RushParticipator> newParticipator() {
-        return match.players()
-                    .filter(player -> player.isParticipating() && scoreModule.getScore(player.getCompetitor()) == 0d)
-                    .map(RushParticipator::new)
-                    .findAny();
     }
 
     public void setBossbar(BossBarSource bossBarSource, Stream<MatchPlayer> players) {
@@ -147,6 +120,7 @@ public class RushMatchModule extends MatchModule implements Listener {
         stopTimelimit();
         MatchScheduler scheduler = match.getScheduler(MatchScope.RUNNING);
         timelimitTask = scheduler.createDelayedTask(Duration.ofSeconds(config.getTimeLimit()), this::transitionToBlank);
+        timelimitStart = System.currentTimeMillis();
     }
 
     public void transitionToBlank() {
@@ -179,9 +153,35 @@ public class RushMatchModule extends MatchModule implements Listener {
     }
 
     private void stopTimelimit() {
-        if (timelimitTask != null && timelimitTask.isRunning()) {
+        if (timelimitTask != null) {
             timelimitTask.cancel();
         }
+
+        timelimitStart = 0;
+    }
+
+    private <T extends RushTransitionState> T createState(Class<T> state) {
+        try {
+            return state.getDeclaredConstructor(getClass()).newInstance(this);
+        } catch (Exception any) {
+            // TODO: Error handling
+            return null;
+        }
+    }
+
+    private void updateState() {
+        Stream.of(transitionStates)
+              .filter(RushTransitionState::canTransition)
+              .findFirst()
+              .map(RushTransitionState::getClass)
+              .ifPresent(this::transitionTo);
+    }
+
+    private Optional<RushParticipator> newParticipator() {
+        return match.players()
+                    .filter(player -> player.isParticipating() && scoreModule.getScore(player.getCompetitor()) == 0d)
+                    .map(RushParticipator::new)
+                    .findAny();
     }
 
     public boolean hasParticipator() {
@@ -236,5 +236,9 @@ public class RushMatchModule extends MatchModule implements Listener {
 
     public RushTransitionState getCurrentState() {
         return currentState;
+    }
+
+    public long getTimelimitStart() {
+        return timelimitStart == 0 ? System.currentTimeMillis() : timelimitStart;
     }
 }

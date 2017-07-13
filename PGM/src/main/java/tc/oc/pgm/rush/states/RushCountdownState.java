@@ -61,6 +61,7 @@ public class RushCountdownState extends RushTransitionState {
 
         if (!rushMatchModule.hasCurrentParticipator()
             || !Objects.equal(participator, rushMatchModule.getCurrentParticipator().getPlayer())) {
+            countdownTask.cancel();
             return;
         }
 
