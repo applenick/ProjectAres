@@ -1,7 +1,5 @@
 package tc.oc.pgm.mapgui;
 
-import java.util.Optional;
-
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -9,14 +7,13 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.applenick.Lightning.utils.ThunderUtils;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 
 import net.md_5.bungee.api.ChatColor;
 import tc.oc.pgm.PGM;
 import tc.oc.pgm.map.MapLibrary;
-import tc.oc.pgm.map.PGMMap;
+import tc.oc.pgm.match.Match;
 import tc.oc.pgm.match.MatchManager;
 
 public class MapMenuListener implements Listener {
@@ -26,17 +23,20 @@ public class MapMenuListener implements Listener {
 	
 	@Inject MapLibrary mapLibrary;
 
-
 	public MapMenuListener(){
 		menu = PGM.get().getMapMenu();
 		manager = PGM.getMatchManager();
 	}
 
 	@EventHandler
-	public void onMenuClick(InventoryClickEvent event){	
-		if(manager == null){ return;}
+	public void onMenuClick(InventoryClickEvent event){
+		if(manager == null){ return; }
 		
-		manager.getCurrentMatch().player(event.getActor()).ifPresent(player -> {
+		Match match = manager.getMatch(event.getActor());
+		
+		if(match == null){ return; }
+		
+		match.player(event.getActor()).ifPresent(player -> {
 
 			if(menu.isViewing(player)){
 
