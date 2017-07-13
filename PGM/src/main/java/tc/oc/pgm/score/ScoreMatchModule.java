@@ -101,6 +101,10 @@ public class ScoreMatchModule extends MatchModule implements Listener {
     }
     
     public void setScore(Competitor competitor, double amount) {
+        if(competitor == null || competitor.getMatch() == null) {
+            return;
+        }
+        
         if(this.config.scoreLimit.isPresent() && amount > this.config.scoreLimit.get()) {
             amount = this.config.scoreLimit.get();
         }

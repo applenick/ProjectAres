@@ -1,244 +1,240 @@
 package tc.oc.pgm.rush;
 
-import static tc.oc.pgm.rush.RushState.COUNTDOWN;
-import static tc.oc.pgm.rush.RushState.PLAYER_RUNNING;
-import static tc.oc.pgm.rush.RushState.WAITING_FOR_PLAYER;
-
 import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import org.bukkit.GameMode;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.util.Vector;
 
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
+import com.google.common.base.Objects;
+import com.google.common.base.Stopwatch;
+
 import tc.oc.commons.bukkit.event.CoarsePlayerMoveEvent;
 import tc.oc.commons.core.scheduler.Task;
 import tc.oc.pgm.bossbar.BossBarMatchModule;
 import tc.oc.pgm.bossbar.BossBarSource;
 import tc.oc.pgm.events.ListenerScope;
-import tc.oc.pgm.events.MatchStateChangeEvent;
-import tc.oc.pgm.join.JoinDenied;
-import tc.oc.pgm.join.JoinHandler;
-import tc.oc.pgm.join.JoinMatchModule;
-import tc.oc.pgm.join.JoinMethod;
-import tc.oc.pgm.join.JoinRequest;
-import tc.oc.pgm.join.JoinResult;
-import tc.oc.pgm.match.Competitor;
+import tc.oc.pgm.events.PlayerChangePartyEvent;
 import tc.oc.pgm.match.Match;
 import tc.oc.pgm.match.MatchModule;
 import tc.oc.pgm.match.MatchPlayer;
+import tc.oc.pgm.match.MatchScheduler;
 import tc.oc.pgm.match.MatchScope;
-import tc.oc.pgm.match.MatchState;
-import tc.oc.pgm.regions.Region;
+import tc.oc.pgm.match.Repeatable;
+import tc.oc.pgm.rush.states.RushBlankState;
+import tc.oc.pgm.rush.states.RushCountdownState;
+import tc.oc.pgm.rush.states.RushFinishLineState;
+import tc.oc.pgm.rush.states.RushGameEndState;
+import tc.oc.pgm.rush.states.RushStartLineState;
+import tc.oc.pgm.rush.states.RushWaitState;
 import tc.oc.pgm.score.ScoreMatchModule;
+import tc.oc.pgm.spawns.events.ParticipantDespawnEvent;
 import tc.oc.pgm.utils.MatchPlayers;
-import tc.oc.pgm.utils.WrappedTimer;
+import tc.oc.time.Time;
 
 @ListenerScope(MatchScope.RUNNING)
-public class RushMatchModule extends MatchModule implements Listener, JoinHandler {
-
-    private static final int COUNTDOWN_SECONDS = 5;
-    private static final WrappedTimer timer = new WrappedTimer();
+public class RushMatchModule extends MatchModule implements Listener {
 
     private final RushConfig config;
-    
+
     private final ScoreMatchModule scoreModule;
     private final BossBarMatchModule bossBarModule;
 
-    private MatchPlayer currentPlayer;
-    private RushState rushState;
-    
-    private Task countdownTask;
+    private final RushTransitionState[] transitionStates;
+    private final Stopwatch timer;
+
+    private RushTransitionState currentState;
+    private RushParticipator currentParticipator;
+    private BossBarSource rushBossbar;
     private Task timelimitTask;
-    private int countdown;
-    private int timeLeft;
-    
-    private BossBarSource spectatorBossBar;
 
     public RushMatchModule(Match match, RushConfig config) {
         super(match);
         this.config = config;
         this.scoreModule = match.needMatchModule(ScoreMatchModule.class);
         this.bossBarModule = match.needMatchModule(BossBarMatchModule.class);
-        this.rushState = COUNTDOWN;
-        this.countdown = COUNTDOWN_SECONDS;
-        this.timeLeft = config.getTimeLimit();
+        this.transitionStates = new RushTransitionState[] { createState(RushBlankState.class),
+                                                            createState(RushCountdownState.class),
+                                                            createState(RushFinishLineState.class),
+                                                            createState(RushGameEndState.class),
+                                                            createState(RushStartLineState.class),
+                                                            createState(RushWaitState.class) };
+        this.timer = Stopwatch.createUnstarted();
+        this.currentState = transitionStates[0];
         match.registerEvents(this);
     }
-    
-    @Override
-    public void load() {
-        super.load();
-        match.needMatchModule(JoinMatchModule.class).registerHandler(this);
-    }
 
-    @Override
-    public JoinResult queryJoin(MatchPlayer joining, JoinRequest request) {
-        if (match.hasStarted() && request.method() != JoinMethod.FORCE) {
-            return JoinDenied.friendly("command.gameplay.join.matchStarted");
+    @Repeatable(interval = @Time(milliseconds = 100), scope = MatchScope.RUNNING)
+    private void tick() {
+        if (rushBossbar != null) {
+            bossBarModule.render(rushBossbar);
         }
 
-        return null;
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onMatchStateChange(final MatchStateChangeEvent event) {
-        if(event.getNewState() == MatchState.Running) {
-            this.currentPlayer = newPlayer().orElse(null);
-            prepare(this.currentPlayer, config.getStartLine(), true);
-        }
+        updateScore();
+        updateState();
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerMove(final CoarsePlayerMoveEvent event) {
-        this.handlePlayerMove(event.getPlayer(), event.getTo().toVector(), event);
-    }
+        MatchPlayer player = this.match.getPlayer(event.getPlayer());
 
-    private void handlePlayerMove(Player bukkit, Vector to, CoarsePlayerMoveEvent event) {
-        MatchPlayer player = this.match.getPlayer(bukkit);
-        Competitor competitor = player.getCompetitor();
-
-        if (player != currentPlayer || !MatchPlayers.canInteract(player)
+        if (!hasCurrentParticipator() || !Objects.equal(player, getCurrentParticipator().getPlayer())
+            || !MatchPlayers.canInteract(player)
             || player.getBukkit().isDead()) {
             return;
         }
 
-        if (checkState(RushState.COUNTDOWN)) {
-            if (event != null) {
-                event.setCancelled(true);
-            }
-            
-            return;
-        }
-        
-        if (timer.start(checkState(WAITING_FOR_PLAYER))) {
-            if (config.getStartLine().contains(to.toBlockVector())) {
-                rushState = PLAYER_RUNNING;
-            }
-            
-            return;
-        } else if (checkState(PLAYER_RUNNING)) {
-            if (config.getFinishLine().contains(to.toBlockVector())) {
-                reset(player, scoreModule.getScore(competitor));
-                timer.reset();
-            }
-            
-            return;
+        if (getCurrentState() instanceof RushCountdownState) {
+            event.setTo(event.getFrom());
         }
 
-        if(currentPlayer == null) {
-            end();
-            return;
-        }
-
-        prepare(currentPlayer, config.getStartLine(), false);
+        currentParticipator.setLastTo(event.getTo().toVector());
+        updateState();
     }
 
-    private void updateCountdown() {
-        if (--countdown <= 0) {
-            resetTimes();
-            currentPlayer.showTitle(new TextComponent("GO!"), null, 5, 10, 5);
-        } else {
-            currentPlayer.showTitle(new TextComponent(Integer.toString(countdown)), null, 5, 10, 5);
-        }
-    }
-    
-    private void reset(MatchPlayer player, double score) {
-        timer.reset();
-        timelimitTask.cancel();
-        timeLeft = config.getTimeLimit();
-        scoreModule.setScore(player.getCompetitor(), score);
-        resetPlayer();
-    }
-    
-    private void resetTimes() {
-        countdown = COUNTDOWN_SECONDS;
-        timeLeft = config.getTimeLimit();
-        rushState = WAITING_FOR_PLAYER;
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerDespawn(final ParticipantDespawnEvent event) {
+        if (hasCurrentParticipator() && Objects.equal(event.getPlayer(), getCurrentParticipator().getPlayer())) {
+            // TODO: Reset player back to default observer state
+            event.getPlayer().getBukkit().setGameMode(GameMode.SURVIVAL);
 
-        if (countdownTask != null) {
-            countdownTask.cancel();
+            transitionToBlank();
         }
     }
 
-    private void resetPlayer() {
-        currentPlayer.setVisible(false);
-        currentPlayer = newPlayer().orElse(null);
-        prepare(currentPlayer, config.getStartLine(), false);
-    }
-
-    private void prepare(MatchPlayer player, Region region, boolean force) {
-        if(player == null) {
-            end();
-            return;
-        }
-        
-        if(state() == COUNTDOWN && !force) return;
-        
-        player.setVisible(true);
-        player.getBukkit().setGameMode(GameMode.ADVENTURE);
-        player.getBukkit().teleport(config.getSpawnLine().getBounds().center().toLocation(player.getWorld()));
-
-        rushState = COUNTDOWN;
-        countdownTask = match.getScheduler(MatchScope.RUNNING).createRepeatingTask(Duration.ofSeconds(1), () -> updateCountdown());
-        timelimitTask = match.getScheduler(MatchScope.RUNNING).createRepeatingTask(Duration.ofSeconds(1), () -> {
-            if(--timeLeft <= 0) {
-                reset(player, 1);
-            } else {
-                long score = (TimeUnit.SECONDS.toMillis(config.getTimeLimit()) - timer.elapsed(TimeUnit.MILLISECONDS));
-                scoreModule.setScore(player.getCompetitor(), score);
-            }
-        });
-        
-        removeBossBar();
-        spectatorBossBar = new BossBarSource() {
-            @Override
-            public BaseComponent barText(Player viewer) {
-                return new TextComponent("You are currently waiting for " + player.getDisplayName() + " to finish");
-            }
-            
-            @Override
-            public float barProgress(Player viewer) {
-                return Math.max(0f, Math.min(1f, 1f - ((timer.elapsed(TimeUnit.MILLISECONDS) * 100 / (config.getTimeLimit() * 1000)) / 100)));
-            }
-        };
-        bossBarModule.add(spectatorBossBar, match.players().filter(other -> other != player).map(MatchPlayer::getBukkit));
-        match.players().filter(other -> other != player).forEach(other -> {
-            other.setVisible(false);
-            other.getBukkit().setGameMode(GameMode.SPECTATOR);
-        });
-    }
-    
-    private void end() {
-        resetTimes();
-        removeBossBar();
-        match.end();
-    }
-    
-    private void removeBossBar() {
-        if(spectatorBossBar != null) {
-            bossBarModule.invalidate(spectatorBossBar);
-            bossBarModule.remove(spectatorBossBar);
+    private <T extends RushTransitionState> T createState(Class<T> state) {
+        try {
+            return state.getDeclaredConstructor(getClass()).newInstance(this);
+        } catch (Exception any) {
+            // TODO: Error handling
+            return null;
         }
     }
 
-    private Optional<MatchPlayer> newPlayer() {
+    private void updateState() {
+        Stream.of(transitionStates)
+              .filter(RushTransitionState::canTransition)
+              .findFirst()
+              .map(RushTransitionState::getClass)
+              .ifPresent(this::transitionTo);
+    }
+
+    private Optional<RushParticipator> newParticipator() {
         return match.players()
-                    .filter(player -> scoreModule.getScore(player.getCompetitor()) == 0d)
+                    .filter(player -> player.isParticipating() && scoreModule.getScore(player.getCompetitor()) == 0d)
+                    .map(RushParticipator::new)
                     .findAny();
     }
 
-    public RushState state() {
-        return rushState;
+    public void setBossbar(BossBarSource bossBarSource, Stream<MatchPlayer> players) {
+        removeBossbar();
+        rushBossbar = bossBarSource;
+        bossBarModule.add(bossBarSource, players.map(MatchPlayer::getBukkit));
     }
 
-    public boolean checkState(RushState rushState) {
-        return state() == rushState;
+    public void removeBossbar() {
+        if (rushBossbar != null) {
+            bossBarModule.invalidate(rushBossbar);
+            bossBarModule.remove(rushBossbar);
+        }
+    }
+
+    public void startTimelimit() {
+        stopTimelimit();
+        MatchScheduler scheduler = match.getScheduler(MatchScope.RUNNING);
+        timelimitTask = scheduler.createDelayedTask(Duration.ofSeconds(config.getTimeLimit()), this::transitionToBlank);
+    }
+
+    public void transitionToBlank() {
+        stopTimelimit();
+
+        if (timer.isRunning()) {
+            timer.stop();
+            updateScore();
+        } else {
+            setScore(1);
+        }
+
+        timer.reset();
+        currentParticipator = null;
+        transitionTo(RushBlankState.class);
+    }
+
+    public long calculateScore() {
+        return TimeUnit.SECONDS.toMillis(config.getTimeLimit()) - timer.elapsed(TimeUnit.MILLISECONDS);
+    }
+
+    private void updateScore() {
+        if (hasCurrentParticipator()) {
+            setScore(calculateScore());
+        }
+    }
+
+    private void setScore(long score) {
+        scoreModule.setScore(currentParticipator.getPlayer().getCompetitor(), score);
+    }
+
+    private void stopTimelimit() {
+        if (timelimitTask != null && timelimitTask.isRunning()) {
+            timelimitTask.cancel();
+        }
+    }
+
+    public boolean hasParticipator() {
+        return currentParticipator != null;
+    }
+
+    public boolean hasNewParticipator() {
+        return newParticipator().isPresent();
+    }
+
+    public void setNewParticipator() {
+        currentParticipator = newParticipator().orElse(null);
+    }
+
+    public <T extends RushTransitionState> T transitionTo(Class<T> state) {
+        if (currentState != null) {
+            currentState.transitionFrom();
+        }
+
+        currentState = createState(state);
+        currentState.transitionTo();
+        return (T) currentState;
+    }
+
+    public Stopwatch getTimer() {
+        return timer;
+    }
+
+    public RushConfig getConfig() {
+        return config;
+    }
+
+    public BossBarMatchModule getBossBarModule() {
+        return bossBarModule;
+    }
+
+    public ScoreMatchModule getScoreModule() {
+        return scoreModule;
+    }
+
+    public boolean hasCurrentParticipator() {
+        return getCurrentParticipator() != null;
+    }
+
+    public RushParticipator getCurrentParticipator() {
+        return currentParticipator;
+    }
+
+    public MatchPlayer getCurrentPlayer() {
+        return getCurrentParticipator().getPlayer();
+    }
+
+    public RushTransitionState getCurrentState() {
+        return currentState;
     }
 }

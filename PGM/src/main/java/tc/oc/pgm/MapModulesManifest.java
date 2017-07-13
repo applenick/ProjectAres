@@ -49,6 +49,7 @@ public class MapModulesManifest extends HybridManifest {
         // MapModuleFactories
         install(new InfoModule.Factory());
         install(new FreeForAllModule.Factory());
+        install(new RushModule.Factory());
         install(new CraftingModule.Factory());
         install(new ItemModifyModule.Factory());
         install(new PickupModule.Factory());
@@ -73,7 +74,6 @@ public class MapModulesManifest extends HybridManifest {
         install(new StaticMethodMapModuleFactory<KillRewardModule>(){});
         install(new StaticMethodMapModuleFactory<GhostSquadronModule>(){});
         install(new StaticMethodMapModuleFactory<RageModule>(){});
-        install(new StaticMethodMapModuleFactory<RushModule>(){});
         install(new StaticMethodMapModuleFactory<FriendlyFireRefundModule>(){});
         install(new StaticMethodMapModuleFactory<BlockDropsModule>(){});
         install(new StaticMethodMapModuleFactory<RenewableModule>(){});
