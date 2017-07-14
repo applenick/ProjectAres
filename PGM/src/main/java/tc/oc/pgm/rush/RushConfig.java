@@ -32,7 +32,6 @@ public class RushConfig {
         this.spawnPoint = spawnPoint;
         this.startLine = startLine;
         this.finishLine = finishLine;
-        System.out.println(spawnPoint);
     }
 
     public int getTimeLimit() {
