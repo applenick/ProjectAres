@@ -26,8 +26,6 @@ import tc.oc.pgm.rush.states.RushFinishLineState;
 import tc.oc.pgm.rush.states.RushGameEndState;
 import tc.oc.pgm.rush.states.RushStartLineState;
 import tc.oc.pgm.rush.states.RushWaitState;
-import tc.oc.pgm.rush.tracker.RushBlockTracker;
-import tc.oc.pgm.rush.tracker.RushPlayerTracker;
 import tc.oc.pgm.score.ScoreMatchModule;
 import tc.oc.time.Time;
 
@@ -43,7 +41,6 @@ public class RushMatchModule extends MatchModule implements Listener {
     private final Stopwatch timer;
 
     private final RushPlayerTracker playerTracker;
-    private final RushBlockTracker blockTracker;
 
     private RushTransitionState currentState;
     private RushParticipator currentParticipator;
@@ -65,7 +62,6 @@ public class RushMatchModule extends MatchModule implements Listener {
                                                             createState(RushWaitState.class) };
         this.timer = Stopwatch.createUnstarted();
         this.playerTracker = new RushPlayerTracker(this);
-        this.blockTracker = new RushBlockTracker();
         this.currentState = transitionStates[0];
     }
 
@@ -199,10 +195,10 @@ public class RushMatchModule extends MatchModule implements Listener {
         return timer;
     }
 
-    public RushBlockTracker getBlockTracker() {
-        return blockTracker;
+    public RushPlayerTracker getPlayerTracker() {
+        return playerTracker;
     }
-    
+
     public RushConfig getConfig() {
         return config;
     }
