@@ -107,7 +107,13 @@ public class RushMatchModule extends MatchModule implements Listener {
     public void startTimelimit() {
         stopTimelimit();
         MatchScheduler scheduler = match.getScheduler(MatchScope.RUNNING);
-        timelimitTask = scheduler.createDelayedTask(Duration.ofSeconds(config.getTimeLimit()), this::transitionToBlank);
+        timelimitTask = scheduler.createDelayedTask(Duration.ofSeconds(config.getTimeLimit()), () -> {
+            if (timer.isRunning()) {
+                timer.stop();
+            }
+
+            transitionToBlank();
+        });
         timelimitStart = System.currentTimeMillis();
     }
 
