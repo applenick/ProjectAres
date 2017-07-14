@@ -2,12 +2,14 @@ package tc.oc.pgm.rush;
 
 import java.util.Set;
 
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.material.MaterialData;
 import org.bukkit.util.Vector;
 
@@ -32,7 +34,7 @@ public class RushPlayerTracker implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerMove(final CoarsePlayerMoveEvent event) {
+    public void onPlayerMove(final PlayerMoveEvent event) {
         MatchPlayer player = rushMatchModule.getMatch().getPlayer(event.getPlayer());
 
         if (!canParticipate(player)) {
@@ -40,7 +42,21 @@ public class RushPlayerTracker implements Listener {
         }
 
         if (rushMatchModule.getCurrentState() instanceof RushCountdownState) {
-            event.setTo(event.getFrom());
+            Location from = event.getFrom();
+            Location to = event.getTo();
+
+            if (from.getBlockX() != to.getBlockX() || from.getBlockZ() != to.getBlockZ()) {
+                event.setTo(event.getFrom());
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerCoarseMove(final CoarsePlayerMoveEvent event) {
+        MatchPlayer player = rushMatchModule.getMatch().getPlayer(event.getPlayer());
+
+        if (!canParticipate(player)) {
+            return;
         }
 
         rushMatchModule.getCurrentParticipator().setLastTo(event.getTo().toVector());

@@ -1,9 +1,13 @@
 package tc.oc.pgm.rush;
 
 import org.bukkit.Location;
+import org.bukkit.util.ImVector;
 
 import tc.oc.pgm.match.Match;
 import tc.oc.pgm.points.PointProvider;
+import tc.oc.pgm.points.PointProviderAttributes;
+import tc.oc.pgm.points.PointProviderLocation;
+import tc.oc.pgm.points.RegionPointProvider;
 import tc.oc.pgm.regions.Region;
 
 public class RushConfig {
@@ -28,6 +32,7 @@ public class RushConfig {
         this.spawnPoint = spawnPoint;
         this.startLine = startLine;
         this.finishLine = finishLine;
+        System.out.println(spawnPoint);
     }
 
     public int getTimeLimit() {
@@ -47,6 +52,24 @@ public class RushConfig {
     }
 
     public Location getSpawnLocation(Match match) {
+        if (spawnPoint instanceof RegionPointProvider) {
+            RegionPointProvider pointProvider = (RegionPointProvider) spawnPoint;
+            PointProviderAttributes attributes = pointProvider.getAttributes();
+
+            ImVector center = pointProvider.getRegion().getBounds().center();
+            PointProviderLocation location = new PointProviderLocation(match.getWorld(), center);
+
+            if (attributes.getYawProvider() != null) {
+                location.setYaw(attributes.getYawProvider().getAngle(center));
+            }
+
+            if (attributes.getPitchProvider() != null) {
+                location.setPitch(attributes.getPitchProvider().getAngle(center));
+            }
+
+            return location.add(0, 0.75, 0);
+        }
+
         return getSpawnPoint().getPoint(match, null);
     }
 
