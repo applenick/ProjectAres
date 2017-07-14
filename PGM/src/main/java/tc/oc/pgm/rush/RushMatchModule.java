@@ -13,6 +13,7 @@ import com.google.common.base.Stopwatch;
 import tc.oc.commons.core.scheduler.Task;
 import tc.oc.pgm.bossbar.BossBarMatchModule;
 import tc.oc.pgm.bossbar.BossBarSource;
+import tc.oc.pgm.countdowns.CountdownContext;
 import tc.oc.pgm.events.ListenerScope;
 import tc.oc.pgm.match.Match;
 import tc.oc.pgm.match.MatchModule;
@@ -36,6 +37,7 @@ public class RushMatchModule extends MatchModule implements Listener {
 
     private final ScoreMatchModule scoreModule;
     private final BossBarMatchModule bossBarModule;
+    private final CountdownContext countdownContext;
 
     private final RushTransitionState[] transitionStates;
     private final Stopwatch timer;
@@ -54,6 +56,7 @@ public class RushMatchModule extends MatchModule implements Listener {
         this.config = config;
         this.scoreModule = match.needMatchModule(ScoreMatchModule.class);
         this.bossBarModule = match.needMatchModule(BossBarMatchModule.class);
+        this.countdownContext = match.countdowns();
         this.transitionStates = new RushTransitionState[] { createState(RushBlankState.class),
                                                             createState(RushCountdownState.class),
                                                             createState(RushFinishLineState.class),
@@ -209,6 +212,10 @@ public class RushMatchModule extends MatchModule implements Listener {
 
     public ScoreMatchModule getScoreModule() {
         return scoreModule;
+    }
+
+    public CountdownContext getCountdownContext() {
+        return countdownContext;
     }
 
     public boolean hasCurrentParticipator() {
