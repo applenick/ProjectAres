@@ -45,7 +45,7 @@ public class RushPlayerTracker implements Listener {
             Location from = event.getFrom();
             Location to = event.getTo();
 
-            if (from.getBlockX() != to.getBlockX() || from.getBlockZ() != to.getBlockZ()) {
+            if (from.getX() != to.getX() || from.getZ() != to.getZ()) {
                 event.setTo(event.getFrom());
             }
         }
