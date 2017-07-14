@@ -43,7 +43,7 @@ public class RegionPointProvider extends Inspectable.Impl implements PointProvid
     public Region getRegion() {
         return region;
     }
-
+    
     @Override
     public int getWeight() {
         return expandedRegions.get().size();
@@ -71,6 +71,10 @@ public class RegionPointProvider extends Inspectable.Impl implements PointProvid
         location = makeSafe(location);
 
         return location;
+    }
+    
+    public PointProviderAttributes getAttributes() {
+        return attributes;
     }
 
     private PointProviderLocation makeSafe(PointProviderLocation location) {
