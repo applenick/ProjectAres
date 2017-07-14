@@ -67,7 +67,7 @@ public class RushConfig {
                 location.setPitch(attributes.getPitchProvider().getAngle(center));
             }
 
-            return location.add(0, 0.75, 0);
+            return location;
         }
 
         return getSpawnPoint().getPoint(match, null);

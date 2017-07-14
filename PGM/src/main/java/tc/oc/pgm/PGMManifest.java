@@ -33,6 +33,7 @@ import tc.oc.pgm.match.MatchPlayerEventRouter;
 import tc.oc.pgm.module.MatchModulesManifest;
 import tc.oc.pgm.mutation.command.MutationCommands;
 import tc.oc.pgm.restart.RestartListener;
+import tc.oc.pgm.rush.RushCountdown;
 import tc.oc.pgm.settings.Settings;
 import tc.oc.pgm.spawns.states.State;
 import tc.oc.pgm.tnt.license.LicenseBroker;
@@ -96,5 +97,6 @@ public final class PGMManifest extends HybridManifest {
         facets.register(FreezeListener.class);
 
         requestStaticInjection(State.class);
+        requestStaticInjection(RushCountdown.class);
     }
 }

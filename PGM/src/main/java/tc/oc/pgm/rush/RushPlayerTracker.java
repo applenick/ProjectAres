@@ -2,14 +2,12 @@ package tc.oc.pgm.rush;
 
 import java.util.Set;
 
-import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.material.MaterialData;
 import org.bukkit.util.Vector;
 
@@ -31,24 +29,6 @@ public class RushPlayerTracker implements Listener {
     public RushPlayerTracker(RushMatchModule rushMatchModule) {
         this.rushMatchModule = rushMatchModule;
         this.snapshotMatchModule = rushMatchModule.getMatch().needMatchModule(SnapshotMatchModule.class);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerMove(final PlayerMoveEvent event) {
-        MatchPlayer player = rushMatchModule.getMatch().getPlayer(event.getPlayer());
-
-        if (!canParticipate(player)) {
-            return;
-        }
-
-        if (rushMatchModule.getCurrentState() instanceof RushCountdownState) {
-            Location from = event.getFrom();
-            Location to = event.getTo();
-
-            if (from.getX() != to.getX() || from.getZ() != to.getZ()) {
-                event.setTo(event.getFrom());
-            }
-        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
