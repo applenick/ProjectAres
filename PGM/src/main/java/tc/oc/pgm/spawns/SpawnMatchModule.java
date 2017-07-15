@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
+
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
@@ -96,13 +98,7 @@ public class SpawnMatchModule extends MatchModule implements Listener {
      * Return all {@link Spawn}s that the given player is currently allowed to spawn at
      */
     public List<Spawn> getSpawns(MatchPlayer player) {
-        List<Spawn> result = Lists.newArrayList();
-        for(Spawn spawn : this.getSpawns()) {
-            if(spawn.allows(player)) {
-                result.add(spawn);
-            }
-        }
-        return result;
+        return this.getSpawns().stream().filter(spawn -> spawn.allows(player)).collect(Collectors.toList());
     }
 
     /**
@@ -285,13 +281,15 @@ public class SpawnMatchModule extends MatchModule implements Listener {
 
     @EventHandler
     public void matchEnd(final MatchEndEvent event) {
-        // Copy states so they can transition without concurrent modification
-        ImmutableMap.copyOf(states).forEach((player, state) -> {
-            // This event can be fired from inside a party change, so some players may have no party
-            if(player.hasParty()) {
-                state.onEvent(event);
-                processQueuedTransitions(player);
-            }
+        /*
+         * Copy states so they can transition without concurrent modification
+         * 
+         * This event can be fired from inside a party change, so some players
+         * may have no party
+         */
+        ImmutableMap.copyOf(states).entrySet().stream().filter(entry -> entry.getKey().hasParty()).forEach(entry -> {
+            entry.getValue().onEvent(event);
+            processQueuedTransitions(entry.getKey());
         });
     }
 
