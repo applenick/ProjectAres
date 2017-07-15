@@ -1,10 +1,13 @@
 package tc.oc.pgm.quota;
 
+import java.util.Arrays;
 import java.util.Collection;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Range;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -95,10 +98,8 @@ public class QuotaMatchModule extends MatchModule implements JoinHandler {
     }
 
     public @Nullable Quota getQuota(MatchPlayer player) {
-        for(Quota quota : getConfig().getQuotas()) {
-            if(quota.appliesTo(player)) return quota;
-        }
-        return null;
+        Iterable<? extends Quota> quotas = getConfig().getQuotas();
+        return Iterables.find(quotas, quota -> quota.appliesTo(player), null);
     }
 
     public QuotaStatus getQuotaStatus(MatchPlayer player, Quota quota, Instant now) {
