@@ -37,11 +37,7 @@ public abstract class Poll implements Runnable {
     }
 
     private int getVotes(boolean filterValue) {
-        int total = 0;
-        for(boolean vote : this.votes.values()) {
-            if(vote == filterValue) total += 1;
-        }
-        return total;
+        return (int) this.votes.values().stream().filter(vote -> vote == filterValue).count();
     }
 
     public long getStartTime() {
