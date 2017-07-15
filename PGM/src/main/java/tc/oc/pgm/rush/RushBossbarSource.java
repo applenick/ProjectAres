@@ -39,7 +39,7 @@ public class RushBossbarSource implements BossBarSource {
     public float barProgress(Player viewer) {
         long elapsed = System.currentTimeMillis() - rushMatchModule.getTimelimitStart();
         long timelimit = rushMatchModule.getConfig().getTimeLimit() * 1000;
-        float progress = 1f - Math.max(0f, Math.min(1f, elapsed * 100 / timelimit / 100f));
+        float progress = 1f - Math.max(0f, Math.min(1f, elapsed / timelimit));
         return progress;
     }
 }
