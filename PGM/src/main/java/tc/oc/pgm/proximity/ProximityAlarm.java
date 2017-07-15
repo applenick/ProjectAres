@@ -117,12 +117,14 @@ public class ProximityAlarm implements Listener {
         if(this.lastMessageTime + MESSAGE_INTERVAL < now) {
             this.lastMessageTime = now;
 
-            for(MatchPlayer player : this.match.getPlayers()) {
-                if(this.definition.alertFilter.query(player).isAllowed()) {
-                    player.sendMessage(ChatColor.RED + this.definition.alertMessage);
-                    player.playSound(SOUND);
-                }
-            }
+            this.match.players()
+                      .filter(player -> this.definition.alertFilter.query(player).isAllowed())
+                      .forEach(this::showMessage);
         }
+    }
+    
+    private void showMessage(MatchPlayer player) {
+        player.sendMessage(ChatColor.RED + this.definition.alertMessage);
+        player.playSound(SOUND);
     }
 }
