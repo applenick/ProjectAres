@@ -1,6 +1,7 @@
 package tc.oc.pgm.proximity;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Sets;
 import tc.oc.time.Time;
@@ -15,9 +16,9 @@ public class ProximityAlarmMatchModule extends MatchModule {
     public ProximityAlarmMatchModule(Match match, Set<ProximityAlarmDefinition> definitions) {
         super(match);
 
-        for(ProximityAlarmDefinition definition : definitions) {
-            proximityAlarms.add(new ProximityAlarm(this.match, definition, match.getRandom()));
-        }
+        proximityAlarms.addAll(definitions.stream()
+                                          .map(definition -> new ProximityAlarm(match, definition, match.getRandom()))
+                                          .collect(Collectors.toSet()));
     }
 
     @Override
@@ -28,9 +29,7 @@ public class ProximityAlarmMatchModule extends MatchModule {
     @Repeatable(interval = @Time(ticks = 3))
     public void repeat() {
         if(!match.isRunning()) return;
-
-        for(ProximityAlarm proximityAlarm : ProximityAlarmMatchModule.this.proximityAlarms) {
-            proximityAlarm.showAlarm();
-        }
+        
+        this.proximityAlarms.forEach(ProximityAlarm::showAlarm);
     }
 }
