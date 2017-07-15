@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
@@ -110,11 +112,7 @@ public class StartMatchModule extends MatchModule implements Listener {
      */
     public Collection<UnreadyReason> getUnreadyReasons(boolean forceStart) {
         if(forceStart) {
-            List<UnreadyReason> reasons = new ArrayList<>(unreadyReasons.size());
-            for(UnreadyReason reason : unreadyReasons) {
-                if(!reason.canForceStart()) reasons.add(reason);
-            }
-            return reasons;
+            return unreadyReasons.stream().filter(reason -> !reason.canForceStart()).collect(Collectors.toList());
         } else {
             return unreadyReasons;
         }
