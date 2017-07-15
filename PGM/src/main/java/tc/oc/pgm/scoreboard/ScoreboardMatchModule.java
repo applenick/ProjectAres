@@ -111,9 +111,8 @@ public class ScoreboardMatchModule extends MatchModule implements Listener {
 
         Team team = scoreboard.registerNewTeam(getScoreboardTeamName(party));
         updatePartyScoreboardTeam(party, team, forObservers);
-        for(MatchPlayer player : party.getPlayers()) {
-            team.addPlayer(player.getBukkit());
-        }
+        
+        party.players().map(MatchPlayer::getBukkit).forEach(team::addPlayer);
 
         return team;
     }
@@ -159,14 +158,11 @@ public class ScoreboardMatchModule extends MatchModule implements Listener {
 
         // Remove the leaving party from all other scoreboards
         String name = getScoreboardTeamName(party);
-        for(Scoreboard otherScoreboard : getScoreboards()) {
+        Iterables.filter(getScoreboards(), otherScoreboard -> otherScoreboard.getTeam(name) != null).forEach(otherScoreboard -> {
             Team team = otherScoreboard.getTeam(name);
-            if(team != null) {
-                logger.fine("Unregistering team " + toString(team) + " from scoreboard " + toString(otherScoreboard));
-                team.unregister();
-            }
-        }
-
+            logger.fine("Unregistering team " + toString(team) + " from scoreboard " + toString(otherScoreboard));
+            team.unregister();
+        });
     }
 
     protected void changePlayerScoreboard(MatchPlayer player, @Nullable Party oldParty, @Nullable Party newParty) {
