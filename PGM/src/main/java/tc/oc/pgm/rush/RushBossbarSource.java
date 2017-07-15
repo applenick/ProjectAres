@@ -3,9 +3,11 @@ package tc.oc.pgm.rush;
 import org.bukkit.entity.Player;
 
 import com.google.api.client.util.Objects;
+import com.google.common.collect.Range;
 
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
+import tc.oc.commons.core.util.Numbers;
 import tc.oc.pgm.bossbar.BossBarSource;
 
 public class RushBossbarSource implements BossBarSource {
@@ -39,7 +41,7 @@ public class RushBossbarSource implements BossBarSource {
     public float barProgress(Player viewer) {
         long elapsed = System.currentTimeMillis() - rushMatchModule.getTimelimitStart();
         long timelimit = rushMatchModule.getConfig().getTimeLimit() * 1000;
-        float progress = 1f - Math.max(0f, Math.min(1f, elapsed / timelimit));
-        return progress;
+        double progress = 1d - Numbers.clamp(elapsed / timelimit, Range.closed(0d, 1d));
+        return (float) progress;
     }
 }
