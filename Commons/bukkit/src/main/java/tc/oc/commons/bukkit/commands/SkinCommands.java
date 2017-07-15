@@ -52,9 +52,7 @@ public class SkinCommands implements NestedCommands, PluginFacet {
     		)
     public void reset(CommandContext args, CommandSender sender) throws CommandException {
     	if(args.hasFlag('a')){    		
-    		for(Player p : users.all()){
-    			p.setSkin(null);
-    		}
+    	    users.all().forEach(user -> user.setSkin(null));
     		sender.sendMessage(ChatColor.WHITE + "All online player skins have been reset.");
     		return;
     	}
@@ -75,15 +73,11 @@ public class SkinCommands implements NestedCommands, PluginFacet {
         boolean all = args.hasFlag('a');
         boolean unsigned = args.hasFlag('u');
         
-        Skin skin = source.getSkin();
-        if(unsigned) {
-            skin = new Skin(skin.getData(), null);
-        }
-        
+        Skin sourceSkin = source.getSkin();
+        Skin skin = unsigned ? new Skin(sourceSkin.getData(), null) : sourceSkin;
+
         if(all){
-        	for(Player p : users.all()){
-        		p.setSkin(skin);
-        	}
+        	users.all().forEach(user -> user.setSkin(skin));
             sender.sendMessage(ChatColor.WHITE + "Cloned " + source.getDisplayName(sender) + ChatColor.WHITE + "'s skin to all online players");
         }else{
             Player target = CommandUtils.getPlayerOrSelf(args, sender, 1);
