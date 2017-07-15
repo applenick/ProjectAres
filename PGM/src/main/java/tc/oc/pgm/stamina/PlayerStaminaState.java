@@ -5,11 +5,13 @@ import java.util.Deque;
 import java.util.Map;
 import javax.annotation.Nullable;
 
+import com.google.common.base.Functions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableRangeMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Ordering;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 import com.google.common.collect.Sets;
@@ -164,15 +166,8 @@ public class PlayerStaminaState {
     }
 
     @Nullable StaminaMutator getDepletionCause() {
-        StaminaMutator cause = null;
-        double max = 0;
-        for(Map.Entry<StaminaMutator, Double> entry : depletionCauses.entrySet()) {
-            if(entry.getValue() > max) {
-                max = entry.getValue();
-                cause = entry.getKey();
-            }
-        }
-        return cause;
+        Ordering<StaminaMutator> ordering = Ordering.natural().onResultOf(Functions.forMap(depletionCauses));
+        return Iterables.getFirst(ordering.greatestOf(depletionCauses.keySet(), 1), null);
     }
 
     void refreshPotions() {
