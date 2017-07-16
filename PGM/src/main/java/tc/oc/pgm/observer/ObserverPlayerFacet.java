@@ -3,8 +3,6 @@ package tc.oc.pgm.observer;
 import java.time.Duration;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -18,6 +16,7 @@ import org.bukkit.util.BlockVector;
 import com.google.api.client.util.Objects;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.inject.Inject;
 
 import me.anxuiz.settings.SettingManager;
 import me.anxuiz.settings.bukkit.PlayerSettings;
@@ -73,31 +72,15 @@ public class ObserverPlayerFacet implements MatchPlayerFacet, Listener {
         restoreAll();
     }
 
-    /*
-     * Unfortunately setting noclip to true does not allow player to move
-     * through the fake air blocks.
-     * 
-     * @TargetedEventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-     */
-    public void onPlayerCoarseMove(CoarsePlayerMoveEvent event) {
-        if (!enabled(match.getPlayer(event.getPlayer()))) return;
-
-        CraftPlayer craftPlayer = (CraftPlayer) event.getPlayer();
-        craftPlayer.getHandle().noclip = brokenBlocks.keySet()
-                                                     .stream()
-                                                     .filter(blockVector -> blockVector.distance(
-                                                             event.getBlockTo().toBlockVector()) < 1.1)
-                                                     .findAny()
-                                                     .isPresent();
-    }
-
     @Repeatable(scope = MatchScope.LOADED, interval = @Time(seconds = 1))
     public void tick() {
-        ImmutableMap.copyOf(brokenBlocks).entrySet().forEach(entry -> {
-            if (System.currentTimeMillis() - entry.getValue() >= RECOVERY.toMillis()) {
-                restore(entry.getKey());
-            }
-        });
+        ImmutableMap.copyOf(brokenBlocks)
+                    .entrySet()
+                    .stream()
+                    .filter(entry -> System.currentTimeMillis() - entry.getValue() >= RECOVERY.toMillis())
+                    .forEach(entry -> {
+                        restore(entry.getKey());
+                    });
     }
 
     public void restore(BlockVector blockVector) {
