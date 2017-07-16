@@ -1,4 +1,4 @@
-package tc.oc.pgm.settings;
+package tc.oc.pgm.observer;
 
 import javax.inject.Inject;
 

@@ -1,9 +1,11 @@
 package tc.oc.pgm.match;
 
 import com.google.inject.AbstractModule;
+
 import tc.oc.pgm.cooldown.CooldownPlayerFacet;
 import tc.oc.pgm.kits.AttributePlayerFacet;
 import tc.oc.pgm.map.MapmakerPlayerFacet;
+import tc.oc.pgm.observer.ObserverPlayerFacet;
 import tc.oc.pgm.portals.PortalPlayerFacet;
 import tc.oc.pgm.projectile.ProjectilePlayerFacet;
 
@@ -23,5 +25,6 @@ public class MatchPlayerFacetManifest extends AbstractModule {
         facets.register(MatchPlayerExecutor.class);
         facets.register(PortalPlayerFacet.class);
         facets.register(ProjectilePlayerFacet.class);
+        facets.register(ObserverPlayerFacet.class);
     }
 }

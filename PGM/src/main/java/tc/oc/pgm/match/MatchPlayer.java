@@ -1,5 +1,9 @@
 package tc.oc.pgm.match;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -7,15 +11,10 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
+
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
-import me.anxuiz.settings.Setting;
-import me.anxuiz.settings.SettingManager;
-import me.anxuiz.settings.bukkit.PlayerSettings;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.EntityLocation;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -25,8 +24,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
-import java.time.Duration;
-import java.time.Instant;
+
+import me.anxuiz.settings.Setting;
+import me.anxuiz.settings.SettingManager;
+import me.anxuiz.settings.bukkit.PlayerSettings;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.BaseComponent;
 import tc.oc.api.bukkit.friends.OnlineFriends;
 import tc.oc.api.bukkit.users.BukkitUserStore;
 import tc.oc.api.docs.PlayerId;
@@ -51,10 +55,8 @@ import tc.oc.pgm.events.PlayerResetEvent;
 import tc.oc.pgm.filters.Filterable;
 import tc.oc.pgm.filters.query.IPlayerQuery;
 import tc.oc.pgm.kits.WalkSpeedKit;
-import tc.oc.pgm.settings.ObserverSetting;
+import tc.oc.pgm.observer.ObserverSettings;
 import tc.oc.pgm.settings.Settings;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * MatchPlayer represents a player who is part of a match.  Note that the
@@ -464,7 +466,7 @@ public class MatchPlayer extends MatchFacetContext<MatchPlayerFacet> implements 
         if(isSpawned() || isDead()) return false;
 
         // If both players are observing, decide based on the viewer's setting
-        switch(settings.getValue(ObserverSetting.get(), ObserverSetting.Options.class)) {
+        switch(settings.getValue(ObserverSettings.Show.get(), ObserverSettings.Show.Options.class)) {
             case NONE:
                 return false;
             case FRIENDS:

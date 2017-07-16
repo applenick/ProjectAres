@@ -8,6 +8,8 @@ import me.anxuiz.settings.types.BooleanType;
 import tc.oc.commons.bukkit.settings.SettingBinder;
 import tc.oc.commons.bukkit.settings.SettingCallbackBinder;
 import tc.oc.commons.core.inject.HybridManifest;
+import tc.oc.pgm.observer.ObserverSettings;
+import tc.oc.pgm.observer.ObserversCallback;
 
 /**
  * Assorted PGM settings that don't have a proper home yet
@@ -17,7 +19,8 @@ public class Settings extends HybridManifest {
     @Override
     protected void configure() {
         final SettingBinder settings = new SettingBinder(publicBinder());
-        settings.addBinding().toInstance(ObserverSetting.get());
+        settings.addBinding().toInstance(ObserverSettings.Show.get());
+        settings.addBinding().toInstance(ObserverSettings.BREAK);
         settings.addBinding().toInstance(BLOOD);
         settings.addBinding().toInstance(RATINGS);
         settings.addBinding().toInstance(SOUNDS);
@@ -25,7 +28,7 @@ public class Settings extends HybridManifest {
 
         bindAndExpose(ObserversCallback.class).in(Singleton.class);
         new SettingCallbackBinder(publicBinder())
-            .changesIn(ObserverSetting.get()).to(ObserversCallback.class);
+            .changesIn(ObserverSettings.Show.get()).to(ObserversCallback.class);
     }
 
     public static final Setting ARROWS = new SettingBuilder()
