@@ -2,9 +2,9 @@ package tc.oc.pgm.observer;
 
 import java.time.Duration;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -20,7 +20,6 @@ import com.google.inject.Inject;
 
 import me.anxuiz.settings.SettingManager;
 import me.anxuiz.settings.bukkit.PlayerSettings;
-import tc.oc.commons.bukkit.event.CoarsePlayerMoveEvent;
 import tc.oc.commons.bukkit.event.targeted.TargetedEventHandler;
 import tc.oc.pgm.PGM;
 import tc.oc.pgm.events.ListenerScope;
@@ -78,9 +77,8 @@ public class ObserverPlayerFacet implements MatchPlayerFacet, Listener {
                     .entrySet()
                     .stream()
                     .filter(entry -> System.currentTimeMillis() - entry.getValue() >= RECOVERY.toMillis())
-                    .forEach(entry -> {
-                        restore(entry.getKey());
-                    });
+                    .map(Entry::getKey)
+                    .forEach(this::restore);
     }
 
     public void restore(BlockVector blockVector) {
