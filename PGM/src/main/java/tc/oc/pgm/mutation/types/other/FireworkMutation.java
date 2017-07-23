@@ -15,6 +15,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import com.applenick.Lightning.utils.ThunderUtils;
 
 import tc.oc.commons.core.random.RandomUtils;
+import tc.oc.pgm.events.MatchPlayerDamageEvent;
 import tc.oc.pgm.events.MatchPlayerDeathEvent;
 import tc.oc.pgm.fireworks.FireworkUtil;
 import tc.oc.pgm.match.Match;
@@ -35,12 +36,13 @@ public class FireworkMutation extends MutationModule.Impl {
 	 * 1/5 Chance of firework on damage
 	 * 
 	 */
-	
+	public Random random;
 	public static Fraction DEATH_CHANCE = Fraction.ONE_QUARTER;
 	public static Fraction DAMAGE_CHANCE = Fraction.ONE_FIFTH;
 
 	public FireworkMutation(Match match) {
 		super(match);
+		this.random = new Random();
 	}
 	
 		
@@ -62,10 +64,9 @@ public class FireworkMutation extends MutationModule.Impl {
 	}
 	
 	@EventHandler
-	public void onDamage(EntityDamageByEntityEvent event){
-		Random rand = new Random();
-		if(RandomUtils.nextBoolean(rand, DAMAGE_CHANCE)){
-			playRandomFirework(event.getEntity().getLocation());
+	public void onDamage(MatchPlayerDamageEvent event){
+		if(RandomUtils.nextBoolean(random, DAMAGE_CHANCE)){
+			playRandomFirework(event.victim().getBukkit().getLocation());
 		}
 	}
 	
