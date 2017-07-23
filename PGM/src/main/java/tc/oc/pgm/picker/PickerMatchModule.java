@@ -305,7 +305,7 @@ public class PickerMatchModule extends MatchModule implements Listener {
 
         if(hand.getType() == Button.JOIN.material) {
             event.setCancelled(true);
-            if(canOpenWindow(player) && (displayTeams || hasClasses || player.getBukkit().hasPermission("pgm.join.choose"))){
+            if(canOpenWindow(player) && (displayTeams || hasClasses || (player.getBukkit().hasPermission("pgm.join.choose") && settingEnabled(player)))){
                 showWindow(player);
             } else {
                 // If there is nothing to pick, just join immediately
