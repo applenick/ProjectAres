@@ -76,7 +76,10 @@ public class MapMenuListener implements Listener {
 
 	@EventHandler
 	public void onMenuClose(InventoryCloseEvent event){
-		manager.getCurrentMatch().player(event.getActor()).ifPresent(player -> menu.removeViewer(player));
+		Match currentMatch = manager.getMatch(event.getActor());
+		if(currentMatch != null){
+			currentMatch.player(event.getActor()).ifPresent(player -> menu.removeViewer(player));
+		}
 	}
 
 }

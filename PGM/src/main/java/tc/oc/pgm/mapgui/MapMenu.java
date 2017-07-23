@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
 
 import tc.oc.commons.bukkit.localization.Translations;
+import tc.oc.commons.core.chat.ChatUtils;
 import tc.oc.commons.core.formatting.StringUtils;
 import tc.oc.commons.core.plugin.PluginFacet;
 import tc.oc.pgm.PGM;
@@ -199,8 +200,7 @@ public class MapMenu extends PageGui implements PluginFacet{
 						);
 			}
 
-			lore.add(StringUtils.truncate(author, 64));
-
+			ChatUtils.wordWrap(author, 136).forEach(line -> lore.add(line));
 
 			//Map Info
 			final InfoModule infoModule = map.getContext().needModule(InfoModule.class);
