@@ -15,6 +15,7 @@ import tc.oc.pgm.mutation.types.kit.ElytraMutation;
 import tc.oc.pgm.mutation.types.kit.EnchantmentMutation;
 import tc.oc.pgm.mutation.types.kit.EquestrianMutation;
 import tc.oc.pgm.mutation.types.kit.ExplosiveMutation;
+import tc.oc.pgm.mutation.types.kit.FireballMutation;
 import tc.oc.pgm.mutation.types.kit.GlowMutation;
 import tc.oc.pgm.mutation.types.kit.HardcoreMutation;
 import tc.oc.pgm.mutation.types.kit.HealthMutation;
@@ -52,7 +53,8 @@ public enum Mutation {
     LIGHTNING  (LightningMutation.class),
     BOMBER     (BomberMutation.class),
     APOCALYPSE (ApocalypseMutation.class),
-    FIREWORK   (FireworkMutation.class);
+    FIREWORK   (FireworkMutation.class),
+    FIREBALL   (FireballMutation.class);
 
     public static final String TYPE_KEY = "mutation.type.";
     public static final String DESCRIPTION_KEY = ".desc";

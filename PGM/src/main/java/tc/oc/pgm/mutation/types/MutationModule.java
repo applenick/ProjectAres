@@ -67,6 +67,10 @@ public interface MutationModule extends Listener {
         public Entropy entropy() {
             return entropy;
         }
+        
+        protected static ItemStack item(String name, Material material, int amount){
+        	return new ItemBuilder().name(name).material(material).amount(amount).unbreakable(true).shareable(false).get();
+        }
 
         protected static ItemStack item(Material material, int amount) {
             return new ItemBuilder().material(material).amount(amount).unbreakable(true).shareable(false).get();
@@ -75,7 +79,7 @@ public interface MutationModule extends Listener {
         protected static ItemStack item(Material material) {
             return item(material, 1);
         }
-
+        
     }
 
 }
