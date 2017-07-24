@@ -46,7 +46,7 @@ public class RushCountdownState extends RushTransitionState {
         rushMatchModule.getMatch()
         .players()
         .filter(other -> other.isParticipating() && !Objects.equal(other, participator))
-        .forEach(other -> observePlayer(other, participator));
+        .forEach(other -> observePlayer(other));
         rushMatchModule.setBossbar(new RushBossbarSource(rushMatchModule), rushMatchModule.getMatch().players());
 
         //Prepare the participator
@@ -62,7 +62,7 @@ public class RushCountdownState extends RushTransitionState {
     	player.refreshVisibility();
     }
     
-    private void observePlayer(MatchPlayer player, MatchPlayer participator){
+    private void observePlayer(MatchPlayer player){
     	player.getBukkit().setGameMode(GameMode.SPECTATOR);
     	    	
     	player.sendHotbarMessage(new TranslatableComponent(RushModule.WAIT_KEY, rushMatchModule.getCurrentParticipator().getPlayer().getColoredName()));
