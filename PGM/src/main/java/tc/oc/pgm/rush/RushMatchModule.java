@@ -5,6 +5,8 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
+import javax.inject.Inject;
+
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
@@ -35,8 +37,6 @@ public class RushMatchModule extends MatchModule implements Listener {
 
     private final RushConfig config;
 
-    private final ScoreMatchModule scoreModule;
-    private final BossBarMatchModule bossBarModule;
     private final CountdownContext countdownContext;
 
     private final RushTransitionState[] transitionStates;
@@ -50,12 +50,14 @@ public class RushMatchModule extends MatchModule implements Listener {
 
     private Task timelimitTask;
     private long timelimitStart;
+    
+    @Inject private ScoreMatchModule scoreModule;
+    @Inject private BossBarMatchModule bossBarModule;
+
 
     public RushMatchModule(Match match, RushConfig config) {
         super(match);
         this.config = config;
-        this.scoreModule = match.needMatchModule(ScoreMatchModule.class);
-        this.bossBarModule = match.needMatchModule(BossBarMatchModule.class);
         this.countdownContext = match.countdowns();
         this.transitionStates = new RushTransitionState[] { createState(RushBlankState.class),
                                                             createState(RushCountdownState.class),
@@ -243,4 +245,5 @@ public class RushMatchModule extends MatchModule implements Listener {
     public long getTimelimitStart() {
         return timelimitStart == 0 ? System.currentTimeMillis() : timelimitStart;
     }
+    
 }

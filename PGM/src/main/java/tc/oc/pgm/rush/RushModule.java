@@ -35,6 +35,10 @@ import tc.oc.pgm.xml.InvalidXMLException;
 public class RushModule implements MapModule, MatchModuleFactory<RushMatchModule> {
 
     private final RushConfig config;
+    
+	public static final String PLAY_KEY = "rush.playing";
+	public static final String WAIT_KEY = "rush.waiting";
+
 
     public RushModule(@Nonnull RushConfig config) {
         this.config = config;

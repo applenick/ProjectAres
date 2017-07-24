@@ -6,10 +6,12 @@ import org.bukkit.GameMode;
 
 import com.google.api.client.util.Objects;
 
+import net.md_5.bungee.api.chat.TranslatableComponent;
 import tc.oc.pgm.match.MatchPlayer;
 import tc.oc.pgm.rush.RushBossbarSource;
 import tc.oc.pgm.rush.RushCountdown;
 import tc.oc.pgm.rush.RushMatchModule;
+import tc.oc.pgm.rush.RushModule;
 import tc.oc.pgm.rush.RushTransitionState;
 
 /**
@@ -37,15 +39,34 @@ public class RushCountdownState extends RushTransitionState {
         RushCountdown countdown = new RushCountdown(rushMatchModule);
         Duration countdownDuration = Duration.ofSeconds(rushMatchModule.getConfig().getCountdown());
         rushMatchModule.getCountdownContext().start(countdown, countdownDuration);
-
+        
         MatchPlayer participator = rushMatchModule.getCurrentPlayer();
-        participator.getBukkit().setGameMode(GameMode.SURVIVAL);
-        participator.getBukkit().teleport(rushMatchModule.getConfig().getSpawnLocation(rushMatchModule.getMatch()));
-
+        
+        //Prepare other players first
         rushMatchModule.getMatch()
-                       .players()
-                       .filter(other -> other.isParticipating() && !Objects.equal(other, participator))
-                       .forEach(other -> other.getBukkit().setGameMode(GameMode.SPECTATOR));
+        .players()
+        .filter(other -> other.isParticipating() && !Objects.equal(other, participator))
+        .forEach(other -> observePlayer(other, participator));
         rushMatchModule.setBossbar(new RushBossbarSource(rushMatchModule), rushMatchModule.getMatch().players());
+
+        //Prepare the participator
+        preparePlayer(participator);
+        participator.getBukkit().teleport(rushMatchModule.getConfig().getSpawnLocation(rushMatchModule.getMatch()));
+    }
+    
+    private void preparePlayer(MatchPlayer player){
+    	player.reset();
+    	player.refreshInteraction();
+    	player.getBukkit().setGameMode(GameMode.SURVIVAL);
+    	
+    	player.refreshVisibility();
+    }
+    
+    private void observePlayer(MatchPlayer player, MatchPlayer participator){
+    	player.getBukkit().setGameMode(GameMode.SPECTATOR);
+    	    	
+    	player.sendHotbarMessage(new TranslatableComponent(RushModule.WAIT_KEY, rushMatchModule.getCurrentParticipator().getPlayer().getColoredName()));
+    	
+    	player.refreshVisibility();
     }
 }

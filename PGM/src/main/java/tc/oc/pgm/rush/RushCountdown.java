@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import tc.oc.commons.bukkit.freeze.FrozenPlayer;
 import tc.oc.commons.bukkit.freeze.PlayerFreezer;
 import tc.oc.pgm.rush.states.RushWaitState;
@@ -27,11 +28,7 @@ public class RushCountdown extends PreMatchCountdown {
         this.rushMatchModule = rushMatchModule;
     }
 
-    @Override
-    public BaseComponent barText(Player viewer) {
-        return secondsRemaining(ChatColor.GREEN);
-    }
-
+    
     @Override
     public void onStart(Duration remaining, Duration total) {
         super.onStart(remaining, total);
