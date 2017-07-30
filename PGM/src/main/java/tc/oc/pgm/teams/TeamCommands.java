@@ -7,6 +7,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import com.github.rmsy.channels.Channel;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -21,6 +22,7 @@ import tc.oc.commons.core.commands.Commands;
 import tc.oc.commons.core.commands.NestedCommands;
 import tc.oc.commons.core.commands.TranslatableCommandException;
 import tc.oc.pgm.PGMTranslations;
+import tc.oc.pgm.channels.ChannelMatchModule;
 import tc.oc.pgm.commands.CommandUtils;
 import tc.oc.pgm.match.Match;
 import tc.oc.pgm.match.MatchPlayer;
@@ -195,4 +197,24 @@ public class TeamCommands implements NestedCommands {
         sender.sendMessage(team.getColoredName() +
                            ChatColor.WHITE + " now has min size " + ChatColor.AQUA + team.getMinPlayers());
     }
+    
+    @Command(
+            aliases = {"send", "talk", "say"},
+            desc = "Send a message to a team channel",
+            usage = "<team> (message)",
+            min = 2)
+        @CommandPermissions("pgm.team.send")
+        public void send(CommandContext args, CommandSender sender) throws CommandException, SuggestException {
+            Match match = utils.module().getMatch();
+            MatchPlayer player = match.getPlayer(sender);
+            ChannelMatchModule cmm = player.getMatch().needMatchModule(ChannelMatchModule.class);
+            Team team = utils.teamArgument(args, 0);
+
+            Channel channel = cmm.getChannel(team);
+            channel.sendMessage(args.getJoinedStrings(1), player.getBukkit());
+
+            if (!player.getBukkit().hasPermission(channel.getListeningPermission())) {
+                sender.sendMessage(ChatColor.YELLOW + PGMTranslations.t("command.chat.team.success", player));
+            }
+        }
 }
