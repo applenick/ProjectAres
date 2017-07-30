@@ -49,15 +49,11 @@ class MasterResolver implements EventResolver, ProjectileResolver {
         // Filter out observers immediately
         if(!players.canInteract(victim)) return new NullDamageInfo();
 
-        for(DamageResolver resolver : damageResolvers) {
-            DamageInfo resolvedInfo = resolver.resolveDamage(damageType, victim, damager);
-            if(resolvedInfo != null) {
-                return resolvedInfo;
-            }
-        }
-
-        // This should never happen
-        return new NullDamageInfo();
+        return damageResolvers.stream()
+                              .map(resolver -> resolver.resolveDamage(damageType, victim, damager))
+                              .filter(resolvedInfo -> resolvedInfo != null)
+                              .findFirst()
+                              .orElse(new NullDamageInfo());
     }
 
     @Override

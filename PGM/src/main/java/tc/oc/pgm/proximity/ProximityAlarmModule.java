@@ -39,11 +39,7 @@ public class ProximityAlarmModule implements MapModule, MatchModuleFactory<Proxi
             definitions.add(parseDefinition(context, elAlarm));
         }
 
-        if(definitions.isEmpty()) {
-            return null;
-        } else {
-            return new ProximityAlarmModule(definitions);
-        }
+        return definitions.isEmpty() ? null : new ProximityAlarmModule(definitions);
     }
 
     public static ProximityAlarmDefinition parseDefinition(MapModuleContext context, Element elAlarm) throws InvalidXMLException {

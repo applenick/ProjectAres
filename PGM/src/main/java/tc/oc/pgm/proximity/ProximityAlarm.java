@@ -1,6 +1,10 @@
 package tc.oc.pgm.proximity;
 
-import com.google.common.collect.Sets;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
@@ -11,20 +15,20 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.util.Vector;
-import tc.oc.pgm.events.ListenerScope;
-import tc.oc.pgm.match.Match;
-import tc.oc.pgm.match.MatchPlayer;
+
+import com.google.common.collect.Sets;
+
 import tc.oc.commons.bukkit.chat.BukkitSound;
 import tc.oc.commons.bukkit.event.CoarsePlayerMoveEvent;
-import tc.oc.pgm.fireworks.FireworkUtil;
 import tc.oc.commons.bukkit.util.NMSHacks;
+import tc.oc.pgm.events.ListenerScope;
+import tc.oc.pgm.fireworks.FireworkUtil;
+import tc.oc.pgm.match.Match;
+import tc.oc.pgm.match.MatchPlayer;
 import tc.oc.pgm.match.MatchScope;
+import tc.oc.pgm.match.Party;
 import tc.oc.pgm.spawns.events.ParticipantDespawnEvent;
 import tc.oc.pgm.spawns.events.ParticipantSpawnEvent;
-
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
 
 @ListenerScope(MatchScope.LOADED)
 public class ProximityAlarm implements Listener {
@@ -90,11 +94,10 @@ public class ProximityAlarm implements Listener {
                                     )
                                 ).toLocation(this.match.getWorld());
 
-        Set<Color> colors = new HashSet<>();
-
-        for(MatchPlayer player : this.playersInside) {
-            colors.add(player.getParty().getFullColor());
-        }
+        Set<Color> colors = this.playersInside.stream()
+                                              .map(MatchPlayer::getParty)
+                                              .map(Party::getFullColor)
+                                              .collect(Collectors.toSet());
 
         Firework firework = FireworkUtil.spawnFirework(location,
                                                        FireworkEffect.builder()
@@ -114,12 +117,14 @@ public class ProximityAlarm implements Listener {
         if(this.lastMessageTime + MESSAGE_INTERVAL < now) {
             this.lastMessageTime = now;
 
-            for(MatchPlayer player : this.match.getPlayers()) {
-                if(this.definition.alertFilter.query(player).isAllowed()) {
-                    player.sendMessage(ChatColor.RED + this.definition.alertMessage);
-                    player.playSound(SOUND);
-                }
-            }
+            this.match.players()
+                      .filter(player -> this.definition.alertFilter.query(player).isAllowed())
+                      .forEach(this::showMessage);
         }
+    }
+    
+    private void showMessage(MatchPlayer player) {
+        player.sendMessage(ChatColor.RED + this.definition.alertMessage);
+        player.playSound(SOUND);
     }
 }

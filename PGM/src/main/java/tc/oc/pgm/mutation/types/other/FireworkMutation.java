@@ -1,6 +1,7 @@
 package tc.oc.pgm.mutation.types.other;
 
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.lang.math.Fraction;
 import org.bukkit.Color;
@@ -36,13 +37,13 @@ public class FireworkMutation extends MutationModule.Impl {
 	 * 1/5 Chance of firework on damage
 	 * 
 	 */
-	public Random random;
-	public static Fraction DEATH_CHANCE = Fraction.ONE_QUARTER;
-	public static Fraction DAMAGE_CHANCE = Fraction.ONE_FIFTH;
+    public static final Random random = ThreadLocalRandom.current();
+    
+	public static final Fraction DEATH_CHANCE  = Fraction.ONE_QUARTER;
+	public static final Fraction DAMAGE_CHANCE = Fraction.ONE_FIFTH;
 
 	public FireworkMutation(Match match) {
 		super(match);
-		this.random = new Random();
 	}
 	
 		
@@ -57,8 +58,7 @@ public class FireworkMutation extends MutationModule.Impl {
 	
 	@EventHandler
 	public void onDeath(MatchPlayerDeathEvent event){
-		Random rand = new Random();
-		if(RandomUtils.nextBoolean(rand, DEATH_CHANCE)){
+		if(RandomUtils.nextBoolean(random, DEATH_CHANCE)){
 			playRandomFirework(event.getVictim().getLocation());
 		}
 	}
@@ -70,5 +70,4 @@ public class FireworkMutation extends MutationModule.Impl {
 		}
 	}
 	
-
 }
